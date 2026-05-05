@@ -6,12 +6,18 @@
 <title>Breezy Weather</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --sky-top: #1a2744;
     --sky-bottom: #2d4a7a;
-    --card-bg: rgba(255,255,255,0.10);
-    --card-border: rgba(255,255,255,0.14);
+    --card-bg: rgba(255,255,255,0.95);
+    --card-border: rgba(0,0,0,0.06);
+    --card-text: #1a2332;
+    --card-text-secondary: #4a5568;
+    --card-text-muted: #718096;
+    --card-accent: #0369a1;
+    --card-ring-track: rgba(0,0,0,0.08);
     --text-primary: #ffffff;
     --text-secondary: rgba(255,255,255,0.72);
     --text-muted: rgba(255,255,255,0.48);
@@ -201,27 +207,26 @@
     background: var(--card-bg); border: 1px solid var(--card-border);
     border-radius: var(--radius-md); padding: 14px 14px 12px;
     min-width: 76px; text-align: center;
-    backdrop-filter: blur(16px);
     display: flex; flex-direction: column; align-items: center; gap: 6px;
     transition: background 0.2s, transform 0.15s;
     cursor: default;
   }
   .hour-card.now {
-    background: rgba(125,211,252,0.2); border-color: var(--accent);
+    background: var(--card-bg); border-color: var(--card-accent);
+    box-shadow: 0 0 0 2px var(--card-accent);
   }
   .hour-card:active { transform: scale(0.97); }
-  .hour-time { font-size: 12px; font-weight: 700; color: var(--text-muted); }
-  .hour-card.now .hour-time { color: var(--accent); }
+  .hour-time { font-size: 12px; font-weight: 700; color: var(--card-text-muted); }
+  .hour-card.now .hour-time { color: var(--card-accent); }
   .hour-icon { font-size: 26px; }
-  .hour-temp { font-size: 16px; font-weight: 700; }
-  .hour-precip { font-size: 11px; color: #60a5fa; font-weight: 600; }
+  .hour-temp { font-size: 16px; font-weight: 700; color: var(--card-text); }
+  .hour-precip { font-size: 11px; color: #2563eb; font-weight: 600; }
 
   /* ── DAILY FORECAST ── */
   .daily-card {
     margin: 0 16px 20px;
     background: var(--card-bg); border: 1px solid var(--card-border);
     border-radius: var(--radius-lg); overflow: hidden;
-    backdrop-filter: blur(16px);
     animation: fadeUp 0.5s ease both; animation-delay: 0.2s;
   }
   @keyframes fadeUp {
@@ -232,25 +237,25 @@
     display: grid; grid-template-columns: 80px 30px 44px 1fr auto;
     align-items: center; gap: 8px;
     padding: 14px 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid var(--card-border);
   }
   .day-row:last-child { border-bottom: none; }
-  .day-name { font-size: 14px; font-weight: 700; }
+  .day-name { font-size: 14px; font-weight: 700; color: var(--card-text); }
   .day-icon { font-size: 22px; text-align: center; }
-  .day-precip-chance { font-size: 11px; color: #60a5fa; font-weight: 700; text-align: center; white-space: nowrap; }
+  .day-precip-chance { font-size: 11px; color: #2563eb; font-weight: 700; text-align: center; white-space: nowrap; }
   .day-bar-wrap { display: flex; align-items: center; gap: 6px; }
-  .day-lo-sm { font-size: 12px; color: var(--accent); font-weight: 600; min-width: 26px; }
+  .day-lo-sm { font-size: 12px; color: #0369a1; font-weight: 600; min-width: 26px; }
   .day-bar-bg {
     flex: 1; height: 4px; border-radius: 2px;
-    background: rgba(255,255,255,0.1); position: relative;
+    background: rgba(0,0,0,0.08); position: relative;
   }
   .day-bar-fill {
     position: absolute; top: 0; height: 4px; border-radius: 2px;
-    background: linear-gradient(to right, var(--accent), #fbbf24);
+    background: linear-gradient(to right, #38bdf8, #f59e0b);
   }
-  .day-hi-sm { font-size: 12px; color: #fbbf24; font-weight: 600; min-width: 26px; text-align: right; }
-  .day-temps { font-size: 14px; font-weight: 700; white-space: nowrap; }
-  .day-temps .lo { color: var(--text-muted); font-weight: 500; }
+  .day-hi-sm { font-size: 12px; color: #d97706; font-weight: 600; min-width: 26px; text-align: right; }
+  .day-temps { font-size: 14px; font-weight: 700; white-space: nowrap; color: var(--card-text); }
+  .day-temps .lo { color: var(--card-text-muted); font-weight: 500; }
 
   /* ── INFO BLOCKS ── */
   .info-grid {
@@ -262,26 +267,25 @@
   .info-block {
     background: var(--card-bg); border: 1px solid var(--card-border);
     border-radius: var(--radius-md); padding: 18px 16px 14px;
-    backdrop-filter: blur(16px);
-    transition: transform 0.15s, background 0.2s;
+    transition: transform 0.15s;
     cursor: default;
   }
   .info-block:active { transform: scale(0.97); }
   .info-block.wide { grid-column: 1 / -1; }
   .info-label {
     font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
-    text-transform: uppercase; color: var(--text-muted);
+    text-transform: uppercase; color: var(--card-text-muted);
     display: flex; align-items: center; gap: 5px; margin-bottom: 10px;
   }
   .info-label .lbl-icon { font-size: 14px; }
-  .info-value { font-size: 30px; font-weight: 700; line-height: 1; }
-  .info-unit { font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-left: 2px; }
-  .info-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
+  .info-value { font-size: 30px; font-weight: 700; line-height: 1; color: var(--card-text); }
+  .info-unit { font-size: 14px; font-weight: 500; color: var(--card-text-secondary); margin-left: 2px; }
+  .info-sub { font-size: 12px; color: var(--card-text-muted); margin-top: 6px; font-weight: 500; }
 
   /* Progress ring */
   .ring-wrap { display: flex; align-items: center; gap: 14px; }
   .ring-svg { flex-shrink: 0; }
-  .ring-track { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 5; }
+  .ring-track { fill: none; stroke: var(--card-ring-track); stroke-width: 5; }
   .ring-fill { fill: none; stroke-width: 5; stroke-linecap: round;
     transform: rotate(-90deg); transform-origin: center;
     transition: stroke-dashoffset 1s ease; }
@@ -293,9 +297,9 @@
   }
   .uv-indicator {
     width: 14px; height: 14px; border-radius: 50%;
-    background: white; border: 2px solid #111;
+    background: white; border: 2px solid #555;
     position: relative; top: -10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     transition: left 0.8s ease;
   }
   .uv-bar-wrap { position: relative; }
@@ -306,7 +310,7 @@
   }
   .wind-rose-circle {
     width: 100%; height: 100%; border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.15);
+    border: 2px solid var(--card-ring-track);
     display: flex; align-items: center; justify-content: center; position: relative;
   }
   .wind-arrow {
@@ -314,7 +318,7 @@
   }
   .wind-labels {
     position: absolute; inset: -4px;
-    font-size: 9px; font-weight: 700; color: var(--text-muted);
+    font-size: 9px; font-weight: 700; color: var(--card-text-muted);
   }
   .wind-labels span {
     position: absolute; width: 100%; text-align: center; left: 0;
@@ -327,12 +331,12 @@
   /* Sun/Moon arc */
   .sun-arc-wrap { padding: 4px 0 0; }
   .sun-arc-svg { width: 100%; overflow: visible; }
-  .sun-track { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 2; stroke-dasharray: 4 4; }
-  .sun-progress { fill: none; stroke: #fbbf24; stroke-width: 2.5; stroke-linecap: round; }
-  .sun-dot { fill: #fbbf24; filter: drop-shadow(0 0 6px #fbbf24); }
+  .sun-track { fill: none; stroke: var(--card-ring-track); stroke-width: 2; stroke-dasharray: 4 4; }
+  .sun-progress { fill: none; stroke: #f59e0b; stroke-width: 2.5; stroke-linecap: round; }
+  .sun-dot { fill: #f59e0b; filter: drop-shadow(0 0 6px #f59e0b); }
   .sun-time-row {
     display: flex; justify-content: space-between;
-    font-size: 11px; font-weight: 700; color: var(--text-muted); margin-top: 6px;
+    font-size: 11px; font-weight: 700; color: var(--card-text-muted); margin-top: 6px;
   }
 
   /* AQI bar */
@@ -352,7 +356,6 @@
     margin: 0 16px 20px;
     background: var(--card-bg); border: 1px solid var(--card-border);
     border-radius: var(--radius-lg); padding: 18px 18px 14px;
-    backdrop-filter: blur(16px);
     animation: fadeUp 0.5s ease both; animation-delay: 0.35s;
   }
   .precip-bars {
@@ -362,16 +365,16 @@
   .precip-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .precip-bar-bg {
     width: 100%; border-radius: 4px 4px 0 0;
-    background: rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.06);
     position: relative; height: 56px; display: flex; align-items: flex-end;
   }
   .precip-bar-fill {
     width: 100%; border-radius: 4px 4px 0 0;
-    background: linear-gradient(to top, #3b82f6, #7dd3fc);
+    background: linear-gradient(to top, #2563eb, #60a5fa);
     transition: height 1s cubic-bezier(0.34,1.56,0.64,1);
     min-height: 2px;
   }
-  .precip-time { font-size: 9px; color: var(--text-muted); font-weight: 600; }
+  .precip-time { font-size: 9px; color: var(--card-text-muted); font-weight: 600; }
 
   /* ── LOADING ── */
   .loading-screen {
@@ -400,11 +403,11 @@
   .error-card {
     margin: 40px 20px; text-align: center; padding: 32px;
     background: var(--card-bg); border: 1px solid rgba(239,68,68,0.3);
-    border-radius: var(--radius-lg); backdrop-filter: blur(16px); display: none;
+    border-radius: var(--radius-lg); display: none;
   }
   .error-card.show { display: block; }
   .error-icon { font-size: 48px; margin-bottom: 12px; }
-  .error-msg { font-size: 15px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; }
+  .error-msg { font-size: 15px; color: var(--card-text-secondary); line-height: 1.5; margin-bottom: 16px; }
   .retry-btn {
     background: var(--accent); color: #0f1e3a; border: none;
     border-radius: var(--radius-sm); padding: 12px 28px;
@@ -436,6 +439,17 @@
   body.theme-snow { background: linear-gradient(170deg, #2a3a4f 0%, #3a5a7a 60%, #2a4560 100%); }
   body.theme-storm { background: linear-gradient(170deg, #0f1520 0%, #1a2030 60%, #252535 100%); }
   body.theme-fog { background: linear-gradient(170deg, #3a4555 0%, #4a5565 60%, #404d5e 100%); }
+
+  /* Night card theme — flat gray */
+  body.night-cards {
+    --card-bg: #2a3144;
+    --card-border: rgba(255,255,255,0.08);
+    --card-text: #e8edf5;
+    --card-text-secondary: #a0aec0;
+    --card-text-muted: #718096;
+    --card-accent: #60a5fa;
+    --card-ring-track: rgba(255,255,255,0.1);
+  }
 
   @media (prefers-color-scheme: light) {
     /* keep dark — it's a weather app */
@@ -526,7 +540,7 @@
       <div class="precip-bars" id="precipBars"></div>
     </div>
 
-    <!-- Info Blocks -->
+    <!-- Current Conditions -->
     <div class="section-label">Current Conditions</div>
     <div class="info-grid">
 
@@ -1065,6 +1079,7 @@ function setTheme(theme, isNight) {
   else if (theme === 'snow') body.classList.add('theme-snow');
   else if (theme === 'storm') body.classList.add('theme-storm');
   else if (theme === 'fog') body.classList.add('theme-fog');
+  if (isNight) body.classList.add('night-cards');
 }
 
 // ── ATMOSPHERE ───────────────────────────────────────
@@ -1168,6 +1183,7 @@ function refresh() {
   if (state.lat && state.lon) fetchWeather(state.lat, state.lon, state.cityLabel);
   else geolocate();
 }
+
 </script>
 </body>
 </html>
