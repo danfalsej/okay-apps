@@ -21,469 +21,326 @@
       --border:       #2a2218;
       --border-bright:#3e3020;
       --red-live:     #c0392b;
-      --ch-chill:     #3a7a6a;
-      --ch-comp:      #7a3a3a;
-      --ch-edu:       #4a5a7a;
     }
 
+    /* ── ROOT SHELL: fills viewport exactly, no scroll ── */
     html, body {
       height: 100%;
-      background: var(--bg);
-      color: var(--ivory);
-      font-family: 'Inconsolata', monospace;
-      overflow-x: hidden;
     }
-
     body {
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ivory);
+      font-family: 'Inconsolata', monospace;
     }
 
     /* ── HEADER ── */
     header {
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1.2rem 2.5rem;
-      border-bottom: 1px solid var(--border-bright);
+      padding: 1rem 2rem;
       background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-bright);
       position: relative;
+      z-index: 10;
     }
-
     header::after {
       content: '';
       position: absolute;
-      bottom: 0; left: 0; right: 0;
+      bottom: -1px; left: 0; right: 0;
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
     }
-
-    .logo {
-      display: flex;
-      align-items: baseline;
-      gap: 0.6rem;
-    }
-
+    .logo { display: flex; align-items: baseline; gap: 0.6rem; }
     .logo-mark {
       font-family: 'Playfair Display', serif;
-      font-size: 1.85rem;
+      font-size: 1.75rem;
       font-weight: 900;
       letter-spacing: -0.02em;
       color: var(--gold-light);
       line-height: 1;
     }
-
-    .logo-mark span {
-      color: var(--ivory);
-    }
-
+    .logo-mark span { color: var(--ivory); }
     .logo-sub {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       letter-spacing: 0.25em;
       color: var(--ivory-dim);
       text-transform: uppercase;
-      padding-bottom: 0.1rem;
     }
-
-    .header-meta {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
+    .header-meta { display: flex; align-items: center; gap: 1.5rem; }
     .live-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--red-live);
-      font-weight: 600;
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--red-live); font-weight: 600;
     }
-
     .live-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
+      width: 7px; height: 7px; border-radius: 50%;
       background: var(--red-live);
       animation: pulse 1.6s ease-in-out infinite;
     }
-
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.75); }
+      50%       { opacity: 0.4; transform: scale(0.75); }
     }
-
     .header-clock {
-      font-size: 0.72rem;
-      color: var(--ivory-dim);
-      letter-spacing: 0.1em;
-      min-width: 5rem;
-      text-align: right;
+      font-size: 0.7rem; color: var(--ivory-dim);
+      letter-spacing: 0.1em; min-width: 5rem; text-align: right;
     }
 
-    /* ── MAIN LAYOUT ── */
-    main {
+    /* ── PAGE BODY: flex row, fills remaining height ── */
+    .page-body {
       flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 280px;
-      grid-template-rows: 1fr auto;
-      gap: 0;
-      min-height: 0;
-    }
-
-    /* ── SCREEN ── */
-    .screen-wrap {
-      grid-column: 1;
-      grid-row: 1;
-      position: relative;
-      background: #000;
       display: flex;
-      flex-direction: column;
-    }
-
-    .screen-label {
-      padding: 0.6rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-panel);
-    }
-
-    .channel-badge {
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      padding: 0.2rem 0.65rem;
-      border-radius: 2px;
-      border: 1px solid currentColor;
-      transition: all 0.3s ease;
-    }
-
-    .channel-badge.chill    { color: #6dbfab; border-color: #6dbfab; }
-    .channel-badge.comp     { color: #e07070; border-color: #e07070; }
-    .channel-badge.edu      { color: #7ea4d8; border-color: #7ea4d8; }
-
-    .now-playing-title {
-      font-size: 0.8rem;
-      color: var(--ivory-dim);
-      font-style: italic;
-    }
-
-    .screen-container {
-      position: relative;
-      flex: 1;
+      flex-direction: row;
+      min-height: 0;        /* critical: lets flex children shrink below content size */
       overflow: hidden;
     }
 
+    /* ── MAIN COLUMN: video + ticker ── */
+    .main-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    /* Screen label bar */
+    .screen-label {
+      flex-shrink: 0;
+      padding: 0.55rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-panel);
+    }
+    .channel-badge {
+      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.2rem 0.6rem; border-radius: 2px; border: 1px solid currentColor;
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .channel-badge.chill { color: #6dbfab; border-color: #6dbfab; }
+    .channel-badge.comp  { color: #e07070; border-color: #e07070; }
+    .channel-badge.edu   { color: #7ea4d8; border-color: #7ea4d8; }
+    .now-playing-title { font-size: 0.78rem; color: var(--ivory-dim); font-style: italic; }
+
+    /* Screen container: flex:1 means it takes all remaining vertical space */
+    .screen-container {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+      background: #000;
+      overflow: hidden;
+    }
+    /* Scanline overlay */
     .screen-container::before {
       content: '';
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.08) 2px,
-        rgba(0,0,0,0.08) 4px
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
       );
       pointer-events: none;
       z-index: 2;
     }
-
+    /* Splash screen */
+    .splash {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1rem;
+      background: #000; z-index: 3;
+    }
+    .splash-king { font-size: 5rem; line-height: 1; opacity: 0.12; }
+    .splash-text {
+      font-family: 'Playfair Display', serif; font-size: 1rem;
+      font-style: italic; color: var(--ivory-ghost); letter-spacing: 0.06em;
+    }
+    /* The iframe fills the container absolutely — this is the key fix */
     #video-iframe {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       border: none;
       display: block;
-      background: #000;
     }
 
-    .splash {
-      position: absolute;
-      inset: 0;
+    /* Ticker footer */
+    .footer-bar {
+      flex-shrink: 0;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border-bright);
+      padding: 0.6rem 1.25rem;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      background: #000;
-      z-index: 3;
+      gap: 1.5rem;
+      position: relative;
     }
-
-    .splash-king {
-      font-size: 5rem;
-      line-height: 1;
-      opacity: 0.15;
-      filter: grayscale(1);
+    .footer-bar::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
     }
-
-    .splash-text {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      font-style: italic;
-      color: var(--ivory-ghost);
-      letter-spacing: 0.05em;
+    .ticker-label {
+      font-size: 0.56rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--gold); flex-shrink: 0;
+    }
+    .ticker-text {
+      font-size: 0.7rem; color: var(--ivory-dim);
+      overflow: hidden; white-space: nowrap; flex: 1;
+    }
+    .ticker-inner {
+      display: inline-block;
+      animation: ticker 38s linear infinite;
+    }
+    @keyframes ticker {
+      0%   { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
     }
 
     /* ── SIDEBAR ── */
     .sidebar {
-      grid-column: 2;
-      grid-row: 1 / 3;
+      flex-shrink: 0;
+      width: 280px;
       background: var(--bg-panel);
       border-left: 1px solid var(--border-bright);
       display: flex;
       flex-direction: column;
       overflow-y: auto;
     }
-
     .sidebar-section {
-      padding: 1.25rem 1.5rem;
+      padding: 1.1rem 1.25rem;
       border-bottom: 1px solid var(--border);
     }
-
     .sidebar-heading {
-      font-size: 0.58rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-size: 0.56rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold-dim); margin-bottom: 0.85rem;
+      display: flex; align-items: center; gap: 0.5rem;
     }
-
     .sidebar-heading::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border-bright);
+      content: ''; flex: 1; height: 1px; background: var(--border-bright);
     }
 
-    /* ── CHANNEL BUTTONS ── */
+    /* Channel buttons */
     .channel-btn {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      width: 100%;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1rem 1rem;
-      cursor: pointer;
-      text-align: left;
-      color: var(--ivory);
-      transition: all 0.25s ease;
-      margin-bottom: 0.6rem;
-      position: relative;
-      overflow: hidden;
+      display: flex; align-items: flex-start; gap: 0.85rem;
+      width: 100%; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 0.85rem; cursor: pointer; text-align: left;
+      color: var(--ivory); transition: background 0.2s, border-color 0.2s;
+      margin-bottom: 0.55rem; position: relative; overflow: hidden;
     }
-
     .channel-btn:last-child { margin-bottom: 0; }
-
     .channel-btn::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: currentColor;
-      opacity: 0;
-      transition: opacity 0.25s ease;
+      content: ''; position: absolute;
+      left: 0; top: 0; bottom: 0; width: 3px;
+      background: currentColor; opacity: 0; transition: opacity 0.2s;
     }
-
-    .channel-btn:hover {
-      border-color: var(--border-bright);
-      background: #1e1a14;
-    }
-
-    .channel-btn:hover::before { opacity: 0.5; }
-
-    .channel-btn.active {
-      border-color: var(--gold-dim);
-      background: #1e1a14;
-    }
-
+    .channel-btn:hover { background: #1c1812; border-color: var(--border-bright); }
+    .channel-btn:hover::before { opacity: 0.4; }
+    .channel-btn.active { background: #1c1812; border-color: var(--gold-dim); }
     .channel-btn.active::before { opacity: 1; }
-
-    .channel-btn.ch-chill  { color: #6dbfab; }
-    .channel-btn.ch-comp   { color: #e07070; }
-    .channel-btn.ch-edu    { color: #7ea4d8; }
+    .channel-btn.ch-chill { color: #6dbfab; }
+    .channel-btn.ch-comp  { color: #e07070; }
+    .channel-btn.ch-edu   { color: #7ea4d8; }
 
     .ch-number {
-      font-size: 1.4rem;
-      font-weight: 600;
-      line-height: 1;
-      opacity: 0.4;
-      min-width: 1.4rem;
-      padding-top: 0.1rem;
+      font-size: 1.3rem; font-weight: 600; line-height: 1;
+      opacity: 0.35; min-width: 1.3rem; padding-top: 0.1rem;
     }
-
     .channel-btn.active .ch-number { opacity: 1; }
-
     .ch-info { flex: 1; }
-
     .ch-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--ivory);
-      margin-bottom: 0.2rem;
-      line-height: 1.2;
+      font-family: 'Playfair Display', serif; font-size: 0.9rem;
+      font-weight: 700; color: var(--ivory); margin-bottom: 0.18rem; line-height: 1.2;
     }
-
-    .ch-desc {
-      font-size: 0.68rem;
-      color: var(--ivory-dim);
-      line-height: 1.5;
-    }
-
-    .ch-playing-indicator {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: currentColor;
-      margin-top: 0.35rem;
-      flex-shrink: 0;
-      display: none;
+    .ch-desc { font-size: 0.65rem; color: var(--ivory-dim); line-height: 1.5; }
+    .ch-pip {
+      width: 7px; height: 7px; border-radius: 50%; background: currentColor;
+      margin-top: 0.35rem; flex-shrink: 0; display: none;
       animation: pulse 1.4s ease-in-out infinite;
     }
+    .channel-btn.active .ch-pip { display: block; }
 
-    .channel-btn.active .ch-playing-indicator { display: block; }
-
-    /* ── INFO PANEL ── */
+    /* Info rows */
     .info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 0.35rem 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.7rem;
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 0.3rem 0; border-bottom: 1px solid var(--border); font-size: 0.68rem;
     }
-
     .info-row:last-child { border-bottom: none; }
     .info-label { color: var(--ivory-dim); }
     .info-value { color: var(--ivory); letter-spacing: 0.05em; }
 
-    /* ── FOOTER BAR ── */
-    .footer-bar {
-      grid-column: 1;
-      grid-row: 2;
-      background: var(--bg-panel);
-      border-top: 1px solid var(--border-bright);
-      padding: 0.7rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      position: relative;
-    }
-
-    .footer-bar::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-    }
-
-    .ticker-label {
-      font-size: 0.58rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--gold);
-      flex-shrink: 0;
-    }
-
-    .ticker-text {
-      font-size: 0.72rem;
-      color: var(--ivory-dim);
-      overflow: hidden;
-      white-space: nowrap;
-      flex: 1;
-    }
-
-    .ticker-inner {
-      display: inline-block;
-      animation: ticker 30s linear infinite;
-    }
-
-    @keyframes ticker {
-      0%   { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-
     /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      main {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-      }
+    @media (max-width: 720px) {
+      .page-body { flex-direction: column; }
       .sidebar {
-        grid-column: 1;
-        grid-row: 2;
-        border-left: none;
-        border-top: 1px solid var(--border-bright);
+        width: 100%; border-left: none; border-top: 1px solid var(--border-bright);
+        flex-shrink: 0; max-height: 45vh; overflow-y: auto;
       }
-      .footer-bar { grid-row: 3; }
-      header { padding: 1rem 1.25rem; }
-      .screen-container { min-height: 55vw; }
+      .screen-container { min-height: 50vw; }
+      header { padding: 0.8rem 1rem; }
+      .logo-sub { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ═══════════ HEADER ═══════════ -->
+  <!-- HEADER -->
   <header>
     <div class="logo">
       <div class="logo-mark">Grandmaster<span> TV</span></div>
       <div class="logo-sub">Chess Broadcasting Network</div>
     </div>
     <div class="header-meta">
-      <div class="live-badge">
-        <div class="live-dot"></div>
-        On Air
-      </div>
+      <div class="live-badge"><div class="live-dot"></div>On Air</div>
       <div class="header-clock" id="clock">--:-- --</div>
     </div>
   </header>
 
-  <!-- ═══════════ MAIN ═══════════ -->
-  <main>
+  <!-- PAGE BODY -->
+  <div class="page-body">
 
-    <!-- Screen -->
-    <div class="screen-wrap">
+    <!-- Main column: video + ticker -->
+    <div class="main-col">
+
       <div class="screen-label">
         <span class="channel-badge" id="ch-badge">— No Channel —</span>
         <span class="now-playing-title" id="now-playing-title">Select a channel to begin watching</span>
       </div>
-      <div class="screen-container" id="screen-container">
+
+      <div class="screen-container">
         <div class="splash" id="splash">
           <div class="splash-king">♛</div>
           <div class="splash-text">Select a channel to begin</div>
         </div>
         <iframe
           id="video-iframe"
-          src=""
+          src="about:blank"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen
           title="Chess TV Player"
         ></iframe>
       </div>
-    </div>
 
-    <!-- Footer ticker -->
-    <div class="footer-bar">
-      <span class="ticker-label">♟ GMTV</span>
-      <div class="ticker-text">
-        <span class="ticker-inner" id="ticker">
+      <div class="footer-bar">
+        <span class="ticker-label">♟ GMTV</span>
+        <div class="ticker-text"><span class="ticker-inner">
           "Chess is the art of analysis." — Mikhail Botvinnik &nbsp;&nbsp;♙&nbsp;&nbsp;
           "Every Chess master was once a beginner." — Irving Chernev &nbsp;&nbsp;♙&nbsp;&nbsp;
-          "Chess holds its master in its own bonds, shackling the mind and brain so that the inner freedom of the very strongest must suffer." — Albert Einstein &nbsp;&nbsp;♙&nbsp;&nbsp;
+          "Chess holds its master in its own bonds." — Albert Einstein &nbsp;&nbsp;♙&nbsp;&nbsp;
           "Not all artists are Chess players, but all Chess players are artists." — Marcel Duchamp &nbsp;&nbsp;♙&nbsp;&nbsp;
           "Chess is ruthless: you've got to be prepared to kill people." — Nigel Short &nbsp;&nbsp;♙&nbsp;&nbsp;
           "The passed Pawn is a criminal, who should be kept under lock and key." — Aaron Nimzowitsch
-        </span>
+        </span></div>
       </div>
+
     </div>
 
     <!-- Sidebar -->
@@ -492,10 +349,9 @@
       <div class="sidebar-section">
         <div class="sidebar-heading">Channels</div>
 
-        <!-- ══ CHANNEL 1: CHILL CHESS ══
-             Replace PLAYLIST_ID_CHILL with your YouTube playlist ID.
-             Example: PLxxxxxxxxxxxxxxxx
-             Find it in the playlist URL: youtube.com/playlist?list=PLxxxxxxxxxxxxxxxx
+        <!-- ══ CHANNEL 1: CHILL CHESS
+             Replace PLAYLIST_ID_CHILL with your YouTube playlist ID
+             (the part after "list=" in the playlist URL)
         ══ -->
         <button class="channel-btn ch-chill" data-channel="chill" onclick="switchChannel(this)">
           <div class="ch-number">01</div>
@@ -503,11 +359,11 @@
             <div class="ch-name">Chill Chess</div>
             <div class="ch-desc">Relaxed streams, ambient commentary &amp; casual games</div>
           </div>
-          <div class="ch-playing-indicator"></div>
+          <div class="ch-pip"></div>
         </button>
 
-        <!-- ══ CHANNEL 2: COMPETITIVE CHESS ══
-             Replace PLAYLIST_ID_COMPETITIVE with your YouTube playlist ID.
+        <!-- ══ CHANNEL 2: COMPETITIVE CHESS
+             Replace PLAYLIST_ID_COMPETITIVE with your YouTube playlist ID
         ══ -->
         <button class="channel-btn ch-comp" data-channel="comp" onclick="switchChannel(this)">
           <div class="ch-number">02</div>
@@ -515,11 +371,11 @@
             <div class="ch-name">Competitive Chess</div>
             <div class="ch-desc">Tournaments, top players &amp; high-stakes battles</div>
           </div>
-          <div class="ch-playing-indicator"></div>
+          <div class="ch-pip"></div>
         </button>
 
-        <!-- ══ CHANNEL 3: EDUCATIONAL CHESS ══
-             Replace PLAYLIST_ID_EDUCATIONAL with your YouTube playlist ID.
+        <!-- ══ CHANNEL 3: EDUCATIONAL CHESS
+             Replace PLAYLIST_ID_EDUCATIONAL with your YouTube playlist ID
         ══ -->
         <button class="channel-btn ch-edu" data-channel="edu" onclick="switchChannel(this)">
           <div class="ch-number">03</div>
@@ -527,12 +383,11 @@
             <div class="ch-name">Educational Chess</div>
             <div class="ch-desc">Lessons, tactics, openings &amp; strategy for all levels</div>
           </div>
-          <div class="ch-playing-indicator"></div>
+          <div class="ch-pip"></div>
         </button>
 
       </div>
 
-      <!-- Info Panel -->
       <div class="sidebar-section">
         <div class="sidebar-heading">Broadcast Info</div>
         <div class="info-row">
@@ -553,23 +408,24 @@
         </div>
       </div>
 
-      <!-- About -->
       <div class="sidebar-section">
         <div class="sidebar-heading">About</div>
-        <p style="font-size:0.72rem; color:var(--ivory-dim); line-height:1.7;">
-          Grandmaster TV delivers curated chess content across three distinct channels — whether you're unwinding, competing at the board, or sharpening your game.
+        <p style="font-size:0.7rem;color:var(--ivory-dim);line-height:1.75;">
+          Grandmaster TV delivers curated chess content across three distinct
+          channels — whether you're unwinding, competing at the board, or
+          sharpening your game.
         </p>
       </div>
 
     </aside>
 
-  </main>
+  </div><!-- /.page-body -->
 
   <script>
     // ═══════════════════════════════════════════════════════
     //  CHANNEL CONFIGURATION
-    //  Replace the playlistId values with your actual
-    //  YouTube playlist IDs (the part after "list=" in the URL)
+    //  Replace the playlistId values below with your actual
+    //  YouTube playlist IDs (the string after "list=" in the URL)
     // ═══════════════════════════════════════════════════════
     const CHANNELS = {
       chill: {
@@ -592,46 +448,37 @@
       }
     };
 
-    // ── Clock ──────────────────────────────────────────────
+    // Clock
     function updateClock() {
-      const now  = new Date();
-      const h    = now.getHours();
-      const m    = now.getMinutes().toString().padStart(2, '0');
-      const ampm = h >= 12 ? 'PM' : 'AM';
-      const h12  = (h % 12) || 12;
+      const now = new Date();
+      const h   = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
+      const ampm = h >= 12 ? 'PM' : 'AM', h12 = (h % 12) || 12;
       document.getElementById('clock').textContent = `${h12}:${m} ${ampm}`;
     }
     updateClock();
     setInterval(updateClock, 30000);
 
-    // ── Channel switching ──────────────────────────────────
+    // Channel switching
     let currentChannel = null;
-
     function switchChannel(btn) {
       const key = btn.dataset.channel;
       if (key === currentChannel) return;
       currentChannel = key;
-
       const ch = CHANNELS[key];
 
-      // Update embed
       const iframe = document.getElementById('video-iframe');
       iframe.src = `https://www.youtube.com/embed/videoseries?list=${ch.playlistId}&rel=0&modestbranding=1`;
 
-      // Hide splash
       document.getElementById('splash').style.display = 'none';
 
-      // Update labels
       const badge = document.getElementById('ch-badge');
       badge.className = `channel-badge ${ch.badgeClass}`;
       badge.textContent = ch.badgeText;
       document.getElementById('now-playing-title').textContent = ch.name;
 
-      // Update sidebar info
       document.getElementById('info-channel').textContent = ch.name;
       document.getElementById('info-status').textContent  = 'Playing';
 
-      // Update buttons
       document.querySelectorAll('.channel-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
     }
