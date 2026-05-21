@@ -36,8 +36,7 @@
       flex-shrink: 0;
       display: flex; align-items: center; justify-content: space-between;
       padding: 1rem 2rem;
-      background: var(--bg-panel);
-      border-bottom: 1px solid var(--border-bright);
+      background: var(--bg-panel); border-bottom: 1px solid var(--border-bright);
       position: relative; z-index: 10;
     }
     header::after {
@@ -59,16 +58,16 @@
     }
     .live-dot {
       width: 7px; height: 7px; border-radius: 50%; background: var(--red-live);
-      animation: pulse 1.6s ease-in-out infinite;
+      animation: blink 1.6s ease-in-out infinite;
     }
-    @keyframes pulse {
+    @keyframes blink {
       0%, 100% { opacity: 1; transform: scale(1); }
       50%       { opacity: 0.4; transform: scale(0.75); }
     }
     .header-clock { font-size: 0.7rem; color: var(--ivory-dim); letter-spacing: 0.1em; min-width: 5rem; text-align: right; }
 
     /* ── PAGE BODY ── */
-    .page-body { flex: 1; display: flex; flex-direction: row; min-height: 0; overflow: hidden; }
+    .page-body { flex: 1; display: flex; min-height: 0; overflow: hidden; }
 
     /* ── MAIN COLUMN ── */
     .main-col { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
@@ -81,62 +80,53 @@
     .channel-badge {
       font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
       padding: 0.2rem 0.6rem; border-radius: 2px; border: 1px solid currentColor;
-      transition: color 0.3s, border-color 0.3s;
+      transition: color 0.3s, border-color 0.3s; flex-shrink: 0;
     }
     .channel-badge.chill { color: #6dbfab; border-color: #6dbfab; }
     .channel-badge.comp  { color: #e07070; border-color: #e07070; }
     .channel-badge.edu   { color: #7ea4d8; border-color: #7ea4d8; }
-    .now-playing-title { font-size: 0.78rem; color: var(--ivory-dim); font-style: italic; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    /* Next video button in label bar */
+    .now-playing-title {
+      font-size: 0.78rem; color: var(--ivory-dim); font-style: italic;
+      flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
     .next-btn {
-      flex-shrink: 0;
-      background: none; border: 1px solid var(--border-bright);
+      flex-shrink: 0; background: none; border: 1px solid var(--border-bright);
       color: var(--ivory-dim); font-family: 'Inconsolata', monospace;
       font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
       padding: 0.2rem 0.65rem; border-radius: 2px; cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
-      display: none;
+      transition: color 0.2s, border-color 0.2s; display: none;
     }
     .next-btn:hover { color: var(--gold-light); border-color: var(--gold-dim); }
     .next-btn.visible { display: inline-block; }
 
+    /* Screen */
     .screen-container {
       flex: 1; position: relative; min-height: 0; background: #000; overflow: hidden;
     }
-    .screen-container::before {
-      content: ''; position: absolute; inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
-      pointer-events: none; z-index: 2;
-    }
-
-    /* Loading / error overlay */
     .screen-overlay {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 1rem;
-      background: #000; z-index: 3;
+      position: absolute; inset: 0; z-index: 3;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;
+      background: #000;
     }
     .screen-overlay.hidden { display: none; }
     .overlay-king { font-size: 4rem; line-height: 1; opacity: 0.12; }
     .overlay-text {
       font-family: 'Playfair Display', serif; font-size: 1rem;
-      font-style: italic; color: var(--ivory-ghost); letter-spacing: 0.06em;
-      text-align: center; max-width: 20rem;
+      font-style: italic; color: var(--ivory-ghost); letter-spacing: 0.06em; text-align: center;
     }
-    .overlay-sub { font-size: 0.68rem; color: var(--ivory-ghost); letter-spacing: 0.08em; }
-
-    /* Loading spinner */
+    .overlay-sub { font-size: 0.66rem; color: var(--ivory-ghost); letter-spacing: 0.08em; }
     .spinner {
-      width: 28px; height: 28px; border-radius: 50%;
+      width: 26px; height: 26px; border-radius: 50%;
       border: 2px solid var(--border-bright); border-top-color: var(--gold-dim);
       animation: spin 0.9s linear infinite; display: none;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner.visible { display: block; }
 
+    /* Plain iframe — same approach as the working version */
     #video-iframe {
-      position: absolute; inset: 0; width: 100%; height: 100%;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
       border: none; display: block;
     }
 
@@ -154,18 +144,17 @@
     .ticker-label { font-size: 0.56rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); flex-shrink: 0; }
     .ticker-text { font-size: 0.7rem; color: var(--ivory-dim); overflow: hidden; white-space: nowrap; flex: 1; }
     .ticker-inner { display: inline-block; animation: ticker 38s linear infinite; }
-    @keyframes ticker {
-      0%   { transform: translateX(100vw); }
-      100% { transform: translateX(-100%); }
-    }
+    @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
 
     /* ── SIDEBAR ── */
     .sidebar {
-      flex-shrink: 0; width: 280px;
-      background: var(--bg-panel); border-left: 1px solid var(--border-bright);
-      display: flex; flex-direction: column; overflow-y: auto;
+      flex-shrink: 0; width: 280px; background: var(--bg-panel);
+      border-left: 1px solid var(--border-bright);
+      display: flex; flex-direction: column; overflow: hidden;
     }
-    .sidebar-section { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .sidebar-section { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .sidebar-section.guide-section { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-height: 0; }
+
     .sidebar-heading {
       font-size: 0.56rem; letter-spacing: 0.3em; text-transform: uppercase;
       color: var(--gold-dim); margin-bottom: 0.85rem;
@@ -173,6 +162,7 @@
     }
     .sidebar-heading::after { content: ''; flex: 1; height: 1px; background: var(--border-bright); }
 
+    /* Channel buttons */
     .channel-btn {
       display: flex; align-items: flex-start; gap: 0.85rem; width: 100%;
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px;
@@ -189,25 +179,25 @@
     .channel-btn:hover::before { opacity: 0.4; }
     .channel-btn.active { background: #1c1812; border-color: var(--gold-dim); }
     .channel-btn.active::before { opacity: 1; }
+    .channel-btn:disabled { opacity: 0.5; cursor: wait; }
     .channel-btn.ch-chill { color: #6dbfab; }
     .channel-btn.ch-comp  { color: #e07070; }
     .channel-btn.ch-edu   { color: #7ea4d8; }
-    /* Disabled state while loading */
-    .channel-btn:disabled { opacity: 0.5; cursor: wait; }
 
     .ch-number { font-size: 1.3rem; font-weight: 600; line-height: 1; opacity: 0.35; min-width: 1.3rem; padding-top: 0.1rem; }
     .channel-btn.active .ch-number { opacity: 1; }
     .ch-info { flex: 1; }
     .ch-name { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; color: var(--ivory); margin-bottom: 0.18rem; line-height: 1.2; }
     .ch-desc { font-size: 0.65rem; color: var(--ivory-dim); line-height: 1.5; }
-    .ch-count { font-size: 0.6rem; color: var(--ivory-ghost); margin-top: 0.3rem; letter-spacing: 0.05em; }
+    .ch-count { font-size: 0.6rem; color: var(--ivory-ghost); margin-top: 0.28rem; }
     .ch-pip {
       width: 7px; height: 7px; border-radius: 50%; background: currentColor;
       margin-top: 0.35rem; flex-shrink: 0; display: none;
-      animation: pulse 1.4s ease-in-out infinite;
+      animation: blink 1.4s ease-in-out infinite;
     }
     .channel-btn.active .ch-pip { display: block; }
 
+    /* Broadcast info rows */
     .info-row {
       display: flex; justify-content: space-between; align-items: baseline;
       padding: 0.3rem 0; border-bottom: 1px solid var(--border); font-size: 0.68rem;
@@ -216,10 +206,59 @@
     .info-label { color: var(--ivory-dim); }
     .info-value { color: var(--ivory); letter-spacing: 0.05em; }
 
+    /* ── GUIDE ── */
+    .guide-list { flex: 1; }
+    .guide-empty {
+      font-size: 0.7rem; color: var(--ivory-ghost); font-style: italic;
+      text-align: center; padding: 1.5rem 0; line-height: 1.7;
+    }
+    .guide-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      gap: 0.18rem 0.5rem;
+      padding: 0.6rem 1.25rem;
+      margin: 0 -1.25rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .guide-item:last-child { border-bottom: none; }
+    .guide-item:hover { background: rgba(255,255,255,0.025); }
+    .guide-item.guide-now {
+      background: rgba(200,162,74,0.07);
+      border-left: 2px solid var(--gold-dim);
+      padding-left: calc(1.25rem - 2px);
+    }
+    .guide-item.guide-now:hover { background: rgba(200,162,74,0.11); }
+    .guide-time {
+      grid-column: 1; grid-row: 1;
+      font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold-dim); line-height: 1;
+    }
+    .guide-item.guide-now .guide-time { color: var(--gold-light); font-weight: 600; }
+    .guide-dur {
+      grid-column: 2; grid-row: 1;
+      font-size: 0.58rem; color: var(--ivory-ghost); letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums; line-height: 1; text-align: right;
+    }
+    .guide-title {
+      grid-column: 1 / 3; grid-row: 2;
+      font-size: 0.72rem; line-height: 1.3;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: var(--ivory-dim);
+    }
+    .guide-item.guide-now .guide-title { color: var(--ivory); }
+    .guide-hint {
+      font-size: 0.6rem; color: var(--ivory-ghost); font-style: italic;
+      text-align: center; padding: 0.6rem 0 0;
+      border-top: 1px solid var(--border); margin-top: 0.3rem; line-height: 1.6;
+    }
+
+    /* ── RESPONSIVE ── */
     @media (max-width: 720px) {
       .page-body { flex-direction: column; }
-      .sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border-bright); flex-shrink: 0; max-height: 45vh; overflow-y: auto; }
-      .screen-container { min-height: 50vw; }
+      .sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border-bright); max-height: 50vh; }
       header { padding: 0.8rem 1rem; }
       .logo-sub { display: none; }
     }
@@ -241,22 +280,19 @@
   <div class="page-body">
 
     <div class="main-col">
-
       <div class="screen-label">
         <span class="channel-badge" id="ch-badge">— No Channel —</span>
         <span class="now-playing-title" id="now-playing-title">Select a channel to begin watching</span>
-        <button class="next-btn" id="next-btn" onclick="playRandom()">⟳ Next Video</button>
+        <button class="next-btn" id="next-btn" onclick="advanceQueue()">⟳ Next Video</button>
       </div>
 
       <div class="screen-container">
-        <!-- Overlay: splash / loading / error -->
         <div class="screen-overlay" id="overlay">
           <div class="spinner" id="spinner"></div>
           <div class="overlay-king" id="overlay-king">♛</div>
-          <div class="overlay-text" id="overlay-text">Select a channel to begin</div>
-          <div class="overlay-sub" id="overlay-sub"></div>
+          <div class="overlay-text"  id="overlay-text">Select a channel to begin</div>
+          <div class="overlay-sub"   id="overlay-sub"></div>
         </div>
-
         <iframe
           id="video-iframe"
           src="about:blank"
@@ -277,24 +313,37 @@
           "The passed Pawn is a criminal, who should be kept under lock and key." — Aaron Nimzowitsch
         </span></div>
       </div>
-
     </div>
 
     <aside class="sidebar">
 
+      <!-- Channels -->
       <div class="sidebar-section">
         <div class="sidebar-heading">Channels</div>
 
         <!--
-          For each channel, set data-txt to the raw URL of your .txt file.
-          Each line of the .txt should be one YouTube URL, e.g.:
-            https://www.youtube.com/watch?v=dQw4w9WgXcQ
-            https://youtu.be/abc123
-          Blank lines and lines starting with # are ignored.
+          ════════════════════════════════════════════════════════
+          HOW TO SET UP YOUR .TXT FILES
+          ════════════════════════════════════════════════════════
+          Each line = one video, in this format:
+            URL | Title | Duration
 
-          Best hosting options (CORS-friendly):
-            • GitHub Gist → click "Raw" → use that URL
-            • GitHub repo file → use raw.githubusercontent.com URL
+          • URL      (required)  any YouTube link format
+          • Title    (optional)  shown in the Guide
+          • Duration (optional)  MM:SS or H:MM:SS — used for Guide start times
+
+          Example lines:
+            https://youtu.be/abc123 | Tal vs Fischer 1959 | 45:23
+            https://youtu.be/xyz | The Immortal Game | 1:02:10
+            https://youtu.be/noDuration | Some Video
+            https://youtu.be/bareUrl
+
+          Lines starting with # are treated as comments and ignored.
+
+          HOST YOUR FILES at a CORS-friendly URL, e.g.:
+            • GitHub Gist  → click Raw → copy that URL
+            • GitHub repo  → use raw.githubusercontent.com URL
+          ════════════════════════════════════════════════════════
         -->
 
         <button class="channel-btn ch-chill" data-channel="chill"
@@ -310,7 +359,7 @@
         </button>
 
         <button class="channel-btn ch-comp" data-channel="comp"
-                data-txt="PASTE_RAW_URL_TO_COMPETITIVE_TXT_HERE"
+                data-txt="https://raw.githubusercontent.com/danfalsej/okay-apps/refs/heads/main/championchess.txt"
                 onclick="switchChannel(this)">
           <div class="ch-number">02</div>
           <div class="ch-info">
@@ -322,7 +371,7 @@
         </button>
 
         <button class="channel-btn ch-edu" data-channel="edu"
-                data-txt="PASTE_RAW_URL_TO_EDUCATIONAL_TXT_HERE"
+                data-txt="https://raw.githubusercontent.com/danfalsej/okay-apps/refs/heads/main/educhess.txt"
                 onclick="switchChannel(this)">
           <div class="ch-number">03</div>
           <div class="ch-info">
@@ -332,170 +381,323 @@
           </div>
           <div class="ch-pip"></div>
         </button>
-
       </div>
 
+      <!-- Broadcast Info -->
       <div class="sidebar-section">
         <div class="sidebar-heading">Broadcast Info</div>
         <div class="info-row"><span class="info-label">Network</span><span class="info-value">GMTV-1</span></div>
-        <div class="info-row"><span class="info-label">Format</span><span class="info-value">HD 16:9</span></div>
-        <div class="info-row"><span class="info-label">Current Ch.</span><span class="info-value" id="info-channel">—</span></div>
-        <div class="info-row"><span class="info-label">Videos loaded</span><span class="info-value" id="info-count">—</span></div>
-        <div class="info-row"><span class="info-label">Status</span><span class="info-value" id="info-status">Standby</span></div>
+        <div class="info-row"><span class="info-label">Format</span> <span class="info-value">HD 16:9</span></div>
+        <div class="info-row"><span class="info-label">Channel</span><span class="info-value" id="info-channel">—</span></div>
+        <div class="info-row"><span class="info-label">Videos</span> <span class="info-value" id="info-count">—</span></div>
+        <div class="info-row"><span class="info-label">Status</span> <span class="info-value" id="info-status">Standby</span></div>
       </div>
 
-      <div class="sidebar-section">
-        <div class="sidebar-heading">About</div>
-        <p style="font-size:0.7rem;color:var(--ivory-dim);line-height:1.75;">
-          Grandmaster TV picks a random video from your curated lists each time
-          you tune in. Hit <em>Next Video</em> any time for a fresh pick.
-        </p>
+      <!-- Guide -->
+      <div class="sidebar-section guide-section">
+        <div class="sidebar-heading">Up Next</div>
+        <div class="guide-list" id="guide-list">
+          <div class="guide-empty">Select a channel<br>to see what's on</div>
+        </div>
       </div>
 
     </aside>
   </div>
 
   <script>
-    // ── State ──────────────────────────────────────────────
-    let currentChannel  = null;   // key of active channel
-    let currentVideos   = [];     // parsed video IDs for active channel
-    const videoCache    = {};     // key → [videoId, ...]  (avoids re-fetching)
+    // ══════════════════════════════════════════════════════════════
+    //  END-OF-VIDEO DETECTION via postMessage
+    //  YouTube sends state-change messages to the parent window
+    //  when the iframe has ?enablejsapi=1 in its URL.
+    //  State 0 = ended. No IFrame API script needed.
+    // ══════════════════════════════════════════════════════════════
+    window.addEventListener('message', function (e) {
+      if (e.origin !== 'https://www.youtube.com') return;
+      try {
+        const data = JSON.parse(e.data);
+        // YouTube sends {event:'onStateChange', info: <state>}
+        if (data.event === 'onStateChange' && data.info === 0) {
+          advanceQueue();
+        }
+      } catch (_) { /* non-JSON messages from other iframes — ignore */ }
+    });
 
-    // ── Clock ──────────────────────────────────────────────
-    function updateClock() {
-      const now = new Date(), h = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
-      document.getElementById('clock').textContent = `${(h%12)||12}:${m} ${h>=12?'PM':'AM'}`;
-    }
-    updateClock(); setInterval(updateClock, 30000);
+    // ══════════════════════════════════════════════════════════════
+    //  STATE
+    // ══════════════════════════════════════════════════════════════
+    let queue      = [];   // shuffled array of video objects for active channel
+    let queueIndex = -1;   // current position in queue
+    const videoCache = {}; // txtUrl → [video objects]
 
-    // ── YouTube URL → video ID ─────────────────────────────
+    // ══════════════════════════════════════════════════════════════
+    //  PARSING UTILITIES
+    // ══════════════════════════════════════════════════════════════
     function extractVideoId(url) {
-      url = url.trim();
-      // youtu.be/ID
+      url = (url || '').trim();
       let m = url.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
       if (m) return m[1];
-      // ?v=ID or &v=ID
       m = url.match(/[?&]v=([A-Za-z0-9_-]{11})/);
       if (m) return m[1];
-      // embed/ID
       m = url.match(/embed\/([A-Za-z0-9_-]{11})/);
       if (m) return m[1];
       return null;
     }
 
-    // ── Fetch & parse a .txt file of YouTube URLs ──────────
+    // "45:23" → 2723 s  |  "1:02:45" → 3765 s  |  else null
+    function parseDuration(str) {
+      if (!str) return null;
+      str = str.trim();
+      const parts = str.split(':').map(Number);
+      if (parts.some(isNaN) || parts.length < 2) return null;
+      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      return parts[0] * 60 + parts[1];
+    }
+
+    // 2723 → "45:23"  |  3765 → "1:02:45"
+    function formatDuration(secs) {
+      if (secs == null) return '?';
+      const h = Math.floor(secs / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      const s = Math.floor(secs % 60);
+      if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      return `${m}:${String(s).padStart(2,'0')}`;
+    }
+
+    function formatTime(date) {
+      const h = date.getHours(), m = date.getMinutes();
+      return `${(h % 12) || 12}:${String(m).padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`;
+    }
+
+    function parseLine(line) {
+      line = (line || '').trim();
+      if (!line || line.startsWith('#')) return null;
+      const parts = line.split('|').map(s => s.trim());
+      const videoId = extractVideoId(parts[0]);
+      if (!videoId) return null;
+      return {
+        videoId,
+        title:    parts[1] || 'Untitled Video',
+        duration: parseDuration(parts[2]),
+      };
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  FETCHING
+    // ══════════════════════════════════════════════════════════════
     async function fetchVideoList(txtUrl) {
       if (videoCache[txtUrl]) return videoCache[txtUrl];
-
       const res = await fetch(txtUrl);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status} — check the URL and CORS settings`);
       const text = await res.text();
-
-      const ids = text
-        .split('\n')
-        .map(l => l.trim())
-        .filter(l => l && !l.startsWith('#'))  // ignore blank lines & comments
-        .map(extractVideoId)
-        .filter(Boolean);                       // drop unrecognised lines
-
-      if (!ids.length) throw new Error('No valid YouTube URLs found in file');
-      videoCache[txtUrl] = ids;
-      return ids;
+      const videos = text.split('\n').map(parseLine).filter(Boolean);
+      if (!videos.length) throw new Error('No valid YouTube URLs found in file');
+      videoCache[txtUrl] = videos;
+      return videos;
     }
 
-    // ── Pick a random video ID ─────────────────────────────
-    function pickRandom(ids) {
-      return ids[Math.floor(Math.random() * ids.length)];
+    // ══════════════════════════════════════════════════════════════
+    //  QUEUE
+    // ══════════════════════════════════════════════════════════════
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
     }
 
-    // ── UI helpers ─────────────────────────────────────────
+    function initQueue(videos) {
+      queue = shuffle(videos);
+      queueIndex = -1;
+    }
+
+    function advanceQueue() {
+      if (!queue.length) return;
+      queueIndex++;
+      if (queueIndex >= queue.length) {
+        // Reshuffle, avoiding the same video repeating at the seam
+        const lastId = queue[queue.length - 1].videoId;
+        queue = shuffle(queue);
+        if (queue[0].videoId === lastId && queue.length > 1) {
+          const swap = Math.floor(Math.random() * (queue.length - 1)) + 1;
+          [queue[0], queue[swap]] = [queue[swap], queue[0]];
+        }
+        queueIndex = 0;
+      }
+      playCurrentQueueItem();
+    }
+
+    function jumpToQueueIndex(idx) {
+      if (idx < 0 || idx >= queue.length) return;
+      queueIndex = idx;
+      playCurrentQueueItem();
+    }
+
+    function playCurrentQueueItem() {
+      if (queueIndex < 0 || !queue[queueIndex]) return;
+      const video = queue[queueIndex];
+      loadVideo(video.videoId);
+      document.getElementById('now-playing-title').textContent = video.title;
+      document.getElementById('info-status').textContent = 'Playing';
+      renderGuide();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  VIDEO LOADING — plain iframe, same as the working version
+    // ══════════════════════════════════════════════════════════════
+    function loadVideo(videoId) {
+      hideOverlay();
+      document.getElementById('next-btn').classList.add('visible');
+      // enablejsapi=1 lets YouTube send postMessage state-change events
+      document.getElementById('video-iframe').src =
+        `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  GUIDE RENDERER
+    // ══════════════════════════════════════════════════════════════
+    function renderGuide() {
+      const el = document.getElementById('guide-list');
+      if (!el) return;
+      if (queueIndex < 0 || !queue.length) {
+        el.innerHTML = '<div class="guide-empty">Select a channel<br>to see what\'s on</div>';
+        return;
+      }
+
+      const MAX_ITEMS = 10;
+      const now = new Date();
+      let cursor = new Date(now);
+      let timeUnknown = false;
+      let html = '';
+
+      for (let offset = 0; offset < MAX_ITEMS; offset++) {
+        const idx = queueIndex + offset;
+        if (idx >= queue.length) break;
+        const v = queue[idx];
+        const isNow = offset === 0;
+
+        const timeStr = isNow ? 'Now Playing'
+                      : timeUnknown ? '~' + formatTime(cursor)
+                      : formatTime(cursor);
+
+        const durStr = v.duration != null ? formatDuration(v.duration) : '?';
+
+        html += `
+          <div class="guide-item${isNow ? ' guide-now' : ''}" onclick="jumpToQueueIndex(${idx})">
+            <div class="guide-time">${timeStr}</div>
+            <div class="guide-dur">${durStr}</div>
+            <div class="guide-title">${escHtml(v.title)}</div>
+          </div>`;
+
+        if (!timeUnknown) {
+          if (v.duration != null) cursor = new Date(cursor.getTime() + v.duration * 1000);
+          else timeUnknown = true;
+        }
+      }
+
+      if (timeUnknown) {
+        html += `<div class="guide-hint">Add durations to your .txt file<br>for exact start times</div>`;
+      }
+
+      el.innerHTML = html;
+    }
+
+    // Refresh guide start times every minute so they stay accurate
+    setInterval(renderGuide, 60000);
+
+    // ══════════════════════════════════════════════════════════════
+    //  UI HELPERS
+    // ══════════════════════════════════════════════════════════════
     function showOverlay(king, text, sub, loading) {
       document.getElementById('overlay').classList.remove('hidden');
-      document.getElementById('overlay-king').style.display = loading ? 'none' : '';
-      document.getElementById('overlay-king').textContent = king;
+      const kingEl = document.getElementById('overlay-king');
+      kingEl.style.display = loading ? 'none' : '';
+      kingEl.textContent = king;
       document.getElementById('overlay-text').textContent = text;
       document.getElementById('overlay-sub').textContent  = sub || '';
       document.getElementById('spinner').classList.toggle('visible', !!loading);
     }
-    function hideOverlay() {
-      document.getElementById('overlay').classList.add('hidden');
-    }
-    function setButtons(disabled) {
-      document.querySelectorAll('.channel-btn').forEach(b => b.disabled = disabled);
-    }
+    function hideOverlay() { document.getElementById('overlay').classList.add('hidden'); }
+    function setButtonsDisabled(d) { document.querySelectorAll('.channel-btn').forEach(b => b.disabled = d); }
 
-    // ── Load iframe ────────────────────────────────────────
-    function loadVideo(videoId) {
-      const iframe = document.getElementById('video-iframe');
-      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-      hideOverlay();
-      document.getElementById('next-btn').classList.add('visible');
-    }
+    // ══════════════════════════════════════════════════════════════
+    //  CHANNEL SWITCHING
+    // ══════════════════════════════════════════════════════════════
+    const CHANNEL_META = {
+      chill: { badgeClass: 'chill', badgeText: 'CH 01 · CHILL',       name: 'Chill Chess'       },
+      comp:  { badgeClass: 'comp',  badgeText: 'CH 02 · COMPETITIVE', name: 'Competitive Chess' },
+      edu:   { badgeClass: 'edu',   badgeText: 'CH 03 · EDUCATIONAL', name: 'Educational Chess' },
+    };
 
-    // ── Play a random video from current list ──────────────
-    function playRandom() {
-      if (!currentVideos.length) return;
-      loadVideo(pickRandom(currentVideos));
-    }
-
-    // ── Switch channel ─────────────────────────────────────
     async function switchChannel(btn) {
       const key    = btn.dataset.channel;
       const txtUrl = btn.dataset.txt;
+      const meta   = CHANNEL_META[key];
 
-      // Update active button styling immediately
       document.querySelectorAll('.channel-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentChannel = key;
 
-      // Update label bar
-      const badgeMap = { chill: ['chill','CH 01 · CHILL'], comp: ['comp','CH 02 · COMPETITIVE'], edu: ['edu','CH 03 · EDUCATIONAL'] };
-      const nameMap  = { chill: 'Chill Chess', comp: 'Competitive Chess', edu: 'Educational Chess' };
-      const [badgeCls, badgeTxt] = badgeMap[key];
       const badge = document.getElementById('ch-badge');
-      badge.className = `channel-badge ${badgeCls}`;
-      badge.textContent = badgeTxt;
-      document.getElementById('now-playing-title').textContent = nameMap[key];
-      document.getElementById('info-channel').textContent = nameMap[key];
+      badge.className   = `channel-badge ${meta.badgeClass}`;
+      badge.textContent = meta.badgeText;
+      document.getElementById('info-channel').textContent = meta.name;
 
-      // If already cached, just play
+      // Already cached — re-shuffle and play immediately
       if (videoCache[txtUrl]) {
-        currentVideos = videoCache[txtUrl];
-        document.getElementById('info-count').textContent = currentVideos.length;
-        playRandom();
+        initQueue(videoCache[txtUrl]);
+        document.getElementById('info-count').textContent = queue.length;
+        advanceQueue();
         return;
       }
 
       // Show loading state
       showOverlay('', 'Tuning in…', 'Fetching video list', true);
-      setButtons(true);
-      document.getElementById('info-status').textContent  = 'Loading…';
-      document.getElementById('info-count').textContent   = '—';
+      setButtonsDisabled(true);
+      document.getElementById('now-playing-title').textContent = 'Loading…';
+      document.getElementById('info-status').textContent = 'Loading…';
+      document.getElementById('info-count').textContent  = '—';
       document.getElementById('next-btn').classList.remove('visible');
       document.getElementById('video-iframe').src = 'about:blank';
+      renderGuide();
 
       try {
-        const ids = await fetchVideoList(txtUrl);
-        currentVideos = ids;
+        const videos = await fetchVideoList(txtUrl);
+        initQueue(videos);
 
-        // Update count badge on button
         const countEl = document.getElementById(`count-${key}`);
-        if (countEl) countEl.textContent = `${ids.length} video${ids.length !== 1 ? 's' : ''}`;
-        document.getElementById('info-count').textContent  = ids.length;
-        document.getElementById('info-status').textContent = 'Playing';
+        if (countEl) countEl.textContent = `${videos.length} video${videos.length !== 1 ? 's' : ''}`;
+        document.getElementById('info-count').textContent = videos.length;
 
-        playRandom();
+        advanceQueue();
       } catch (err) {
-        currentVideos = [];
+        queue = []; queueIndex = -1;
         showOverlay('✕', 'Could not load video list', err.message);
+        document.getElementById('now-playing-title').textContent = 'Error';
         document.getElementById('info-status').textContent = 'Error';
-        console.error('GMTV fetch error:', err);
+        renderGuide();
+        console.error('GMTV:', err);
       } finally {
-        setButtons(false);
-        // Restore active class (disabled clears it visually)
+        setButtonsDisabled(false);
         btn.classList.add('active');
       }
     }
+
+    // ══════════════════════════════════════════════════════════════
+    //  CLOCK
+    // ══════════════════════════════════════════════════════════════
+    function updateClock() {
+      const now = new Date(), h = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
+      document.getElementById('clock').textContent = `${(h%12)||12}:${m} ${h>=12?'PM':'AM'}`;
+    }
+    updateClock();
+    setInterval(updateClock, 30000);
   </script>
 
 </body>
