@@ -4,126 +4,226 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grandmaster TV</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inconsolata:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:           #080604;
-      --bg-panel:     #100e0b;
-      --bg-card:      #181410;
-      --gold:         #c8a24a;
-      --gold-light:   #e6c978;
-      --gold-dim:     #7a6228;
-      --ivory:        #f0e8d0;
-      --ivory-dim:    #a09070;
-      --ivory-ghost:  #4a4030;
-      --border:       #2a2218;
-      --border-bright:#3e3020;
-      --red-live:     #c0392b;
+      /* surfaces */
+      --bg:           #0c0d11;
+      --bg-panel:     #13151c;
+      --bg-card:      #1a1d27;
+      --bg-hover:     #1e2230;
+
+      /* borders */
+      --border:       #22253200;
+      --border-dim:   #222532;
+      --border-mid:   #2e3245;
+      --border-bright:#3d4260;
+
+      /* text */
+      --text:         #e6e8f0;
+      --text-dim:     #7b82a0;
+      --text-ghost:   #3a3f55;
+
+      /* accent — clean amber */
+      --gold:         #e2a93a;
+      --gold-bright:  #f0c060;
+      --gold-dim:     #6b4f1a;
+      --gold-glow:    rgba(226,169,58,0.12);
+
+      /* live red */
+      --red:          #e05555;
+
+      /* channels */
+      --chill:        #3ecfbe;
+      --chill-bg:     rgba(62,207,190,0.07);
+      --comp:         #ff7c5c;
+      --comp-bg:      rgba(255,124,92,0.07);
+      --edu:          #9b8cf8;
+      --edu-bg:       rgba(155,140,248,0.07);
     }
 
     html, body { height: 100%; }
     body {
       display: flex; flex-direction: column;
       height: 100vh; overflow: hidden;
-      background: var(--bg); color: var(--ivory);
-      font-family: 'Inconsolata', monospace;
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 14px; line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── HEADER ── */
+    /* ─────────────────────────────────────────
+       HEADER
+    ───────────────────────────────────────── */
     header {
       flex-shrink: 0;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 2rem;
-      background: var(--bg-panel); border-bottom: 1px solid var(--border-bright);
+      padding: 0 2rem;
+      height: 56px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-mid);
       position: relative; z-index: 10;
     }
-    header::after {
-      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+
+    .logo {
+      display: flex; align-items: center; gap: 0.75rem;
     }
-    .logo { display: flex; align-items: baseline; gap: 0.6rem; }
+
     .logo-mark {
-      font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 900;
-      letter-spacing: -0.02em; color: var(--gold-light); line-height: 1;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem; font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: var(--text);
     }
-    .logo-mark span { color: var(--ivory); }
-    .logo-sub { font-size: 0.6rem; letter-spacing: 0.25em; color: var(--ivory-dim); text-transform: uppercase; }
-    .header-meta { display: flex; align-items: center; gap: 1.5rem; }
+    .logo-mark em {
+      color: var(--gold);
+      font-style: normal;
+    }
+
+    .logo-divider {
+      width: 1px; height: 20px;
+      background: var(--border-mid);
+    }
+
+    .logo-sub {
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-ghost);
+    }
+
+    .header-right {
+      display: flex; align-items: center; gap: 1.25rem;
+    }
+
     .live-badge {
       display: flex; align-items: center; gap: 0.4rem;
-      font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--red-live); font-weight: 600;
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--red);
     }
     .live-dot {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--red-live);
-      animation: blink 1.6s ease-in-out infinite;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--red);
+      animation: pulse 1.8s ease-in-out infinite;
     }
-    @keyframes blink {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.4; transform: scale(0.75); }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
     }
-    .header-clock { font-size: 0.7rem; color: var(--ivory-dim); letter-spacing: 0.1em; min-width: 5rem; text-align: right; }
 
-    /* ── PAGE BODY ── */
-    .page-body { flex: 1; display: flex; min-height: 0; overflow: hidden; }
+    .header-clock {
+      font-size: 0.75rem; font-weight: 400;
+      color: var(--text-dim); letter-spacing: 0.06em;
+      font-variant-numeric: tabular-nums;
+    }
 
-    /* ── MAIN COLUMN ── */
-    .main-col { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+    /* ─────────────────────────────────────────
+       PAGE BODY
+    ───────────────────────────────────────── */
+    .page-body {
+      flex: 1; display: flex; min-height: 0; overflow: hidden;
+    }
 
-    .screen-label {
-      flex-shrink: 0; padding: 0.55rem 1.25rem;
-      display: flex; align-items: center; gap: 0.9rem;
-      border-bottom: 1px solid var(--border); background: var(--bg-panel);
+    /* ─────────────────────────────────────────
+       MAIN COLUMN
+    ───────────────────────────────────────── */
+    .main-col {
+      flex: 1; display: flex; flex-direction: column;
+      min-width: 0; overflow: hidden;
     }
-    .channel-badge {
-      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
-      padding: 0.2rem 0.6rem; border-radius: 2px; border: 1px solid currentColor;
-      transition: color 0.3s, border-color 0.3s; flex-shrink: 0;
+
+    /* Now-playing bar */
+    .now-bar {
+      flex-shrink: 0;
+      height: 40px;
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0 1.25rem;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-mid);
     }
-    .channel-badge.chill { color: #6dbfab; border-color: #6dbfab; }
-    .channel-badge.comp  { color: #e07070; border-color: #e07070; }
-    .channel-badge.edu   { color: #7ea4d8; border-color: #7ea4d8; }
-    .now-playing-title {
-      font-size: 0.78rem; color: var(--ivory-dim); font-style: italic;
-      flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+
+    .ch-pill {
+      flex-shrink: 0;
+      height: 20px; padding: 0 0.55rem;
+      border-radius: 3px;
+      font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      display: flex; align-items: center;
+      transition: background 0.25s, color 0.25s;
+      background: var(--bg-card);
+      color: var(--text-ghost);
+      border: 1px solid var(--border-mid);
     }
-    .next-btn {
-      flex-shrink: 0; background: none; border: 1px solid var(--border-bright);
-      color: var(--ivory-dim); font-family: 'Inconsolata', monospace;
-      font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
-      padding: 0.2rem 0.65rem; border-radius: 2px; cursor: pointer;
-      transition: color 0.2s, border-color 0.2s; display: none;
+    .ch-pill.chill { background: var(--chill-bg); color: var(--chill); border-color: transparent; }
+    .ch-pill.comp  { background: var(--comp-bg);  color: var(--comp);  border-color: transparent; }
+    .ch-pill.edu   { background: var(--edu-bg);   color: var(--edu);   border-color: transparent; }
+
+    .now-title {
+      flex: 1; font-size: 0.8rem; font-weight: 400;
+      color: var(--text-dim);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .next-btn:hover { color: var(--gold-light); border-color: var(--gold-dim); }
-    .next-btn.visible { display: inline-block; }
+
+    .skip-btn {
+      flex-shrink: 0;
+      display: none;
+      align-items: center; gap: 0.35rem;
+      background: none; border: 1px solid var(--border-mid);
+      color: var(--text-dim); cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0 0.65rem; height: 24px; border-radius: 3px;
+      transition: color 0.18s, border-color 0.18s, background 0.18s;
+    }
+    .skip-btn svg { opacity: 0.6; }
+    .skip-btn:hover {
+      color: var(--gold-bright);
+      border-color: var(--gold-dim);
+      background: var(--gold-glow);
+    }
+    .skip-btn:hover svg { opacity: 1; }
+    .skip-btn.visible { display: flex; }
 
     /* Screen */
     .screen-container {
-      flex: 1; position: relative; min-height: 0; background: #000; overflow: hidden;
+      flex: 1; position: relative;
+      min-height: 0; background: #000; overflow: hidden;
     }
     .screen-overlay {
       position: absolute; inset: 0; z-index: 3;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1.25rem;
       background: #000;
     }
     .screen-overlay.hidden { display: none; }
-    .overlay-king { font-size: 4rem; line-height: 1; opacity: 0.12; }
-    .overlay-text {
-      font-family: 'Playfair Display', serif; font-size: 1rem;
-      font-style: italic; color: var(--ivory-ghost); letter-spacing: 0.06em; text-align: center;
+
+    .overlay-glyph {
+      font-size: 3.5rem; line-height: 1;
+      opacity: 0.08; user-select: none;
     }
-    .overlay-sub { font-size: 0.66rem; color: var(--ivory-ghost); letter-spacing: 0.08em; }
+    .overlay-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-style: italic;
+      color: var(--text-ghost); letter-spacing: 0.04em;
+      text-align: center;
+    }
+    .overlay-sub {
+      font-size: 0.7rem; color: var(--text-ghost);
+      letter-spacing: 0.06em;
+    }
     .spinner {
-      width: 26px; height: 26px; border-radius: 50%;
-      border: 2px solid var(--border-bright); border-top-color: var(--gold-dim);
-      animation: spin 0.9s linear infinite; display: none;
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid var(--border-mid);
+      border-top-color: var(--gold);
+      animation: spin 0.85s linear infinite; display: none;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner.visible { display: block; }
 
-    /* Plain iframe — same approach as the working version */
     #video-iframe {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
@@ -131,171 +231,301 @@
     }
 
     /* Ticker */
-    .footer-bar {
-      flex-shrink: 0; background: var(--bg-panel);
-      border-top: 1px solid var(--border-bright);
-      padding: 0.6rem 1.25rem;
-      display: flex; align-items: center; gap: 1.5rem; position: relative;
+    .ticker-bar {
+      flex-shrink: 0; height: 32px;
+      display: flex; align-items: center; gap: 1rem;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border-mid);
+      padding: 0 1.25rem;
+      overflow: hidden;
     }
-    .footer-bar::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    .ticker-label {
+      flex-shrink: 0;
+      font-size: 0.55rem; font-weight: 700;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--gold);
+      padding-right: 0.75rem;
+      border-right: 1px solid var(--border-mid);
     }
-    .ticker-label { font-size: 0.56rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); flex-shrink: 0; }
-    .ticker-text { font-size: 0.7rem; color: var(--ivory-dim); overflow: hidden; white-space: nowrap; flex: 1; }
-    .ticker-inner { display: inline-block; animation: ticker 38s linear infinite; }
-    @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+    .ticker-track {
+      flex: 1; overflow: hidden; white-space: nowrap;
+    }
+    .ticker-inner {
+      display: inline-block;
+      font-size: 0.7rem; color: var(--text-dim); font-weight: 300;
+      animation: scroll-ticker 45s linear infinite;
+    }
+    @keyframes scroll-ticker {
+      from { transform: translateX(100vw); }
+      to   { transform: translateX(-100%); }
+    }
 
-    /* ── SIDEBAR ── */
+    /* ─────────────────────────────────────────
+       SIDEBAR
+    ───────────────────────────────────────── */
     .sidebar {
-      flex-shrink: 0; width: 280px; background: var(--bg-panel);
-      border-left: 1px solid var(--border-bright);
-      display: flex; flex-direction: column; overflow: hidden;
+      flex-shrink: 0; width: 272px;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-mid);
+      display: flex; flex-direction: column;
+      overflow: hidden;
     }
-    .sidebar-section { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-    .sidebar-section.guide-section { flex: 1; overflow-y: auto; display: flex; flex-direction: column; min-height: 0; }
 
-    .sidebar-heading {
-      font-size: 0.56rem; letter-spacing: 0.3em; text-transform: uppercase;
-      color: var(--gold-dim); margin-bottom: 0.85rem;
+    /* Channel selector tabs at the top of sidebar */
+    .channel-tabs {
+      flex-shrink: 0;
+      padding: 1rem 1rem 0;
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+
+    .ch-tab {
+      display: flex; align-items: center; gap: 0.75rem;
+      width: 100%; padding: 0.7rem 0.85rem;
+      background: none; border: 1px solid var(--border-dim);
+      border-radius: 6px; cursor: pointer; text-align: left;
+      color: var(--text);
+      transition: background 0.18s, border-color 0.18s;
+      position: relative; overflow: hidden;
+    }
+    .ch-tab:disabled { opacity: 0.45; cursor: wait; }
+    .ch-tab:not(:disabled):hover {
+      background: var(--bg-hover);
+      border-color: var(--border-bright);
+    }
+
+    /* accent bar on the left */
+    .ch-tab::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+      background: var(--tab-accent, transparent);
+      transition: opacity 0.18s;
+      opacity: 0;
+    }
+    .ch-tab.active::before { opacity: 1; }
+    .ch-tab.active {
+      background: var(--tab-bg, var(--bg-hover));
+      border-color: var(--tab-border, var(--border-bright));
+    }
+
+    .ch-tab.ch-chill { --tab-accent: var(--chill); --tab-bg: var(--chill-bg); --tab-border: rgba(62,207,190,0.25); }
+    .ch-tab.ch-comp  { --tab-accent: var(--comp);  --tab-bg: var(--comp-bg);  --tab-border: rgba(255,124,92,0.25); }
+    .ch-tab.ch-edu   { --tab-accent: var(--edu);   --tab-bg: var(--edu-bg);   --tab-border: rgba(155,140,248,0.25); }
+
+    .ch-tab-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0; background: var(--dot-color, var(--text-ghost));
+      transition: background 0.18s;
+    }
+    .ch-tab.ch-chill .ch-tab-dot { --dot-color: var(--chill); }
+    .ch-tab.ch-comp  .ch-tab-dot { --dot-color: var(--comp); }
+    .ch-tab.ch-edu   .ch-tab-dot { --dot-color: var(--edu); }
+
+    .ch-tab-info { flex: 1; min-width: 0; }
+    .ch-tab-name {
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--text); line-height: 1.2;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .ch-tab-count {
+      font-size: 0.6rem; font-weight: 400;
+      color: var(--text-ghost); margin-left: auto;
+    }
+    .ch-tab-desc {
+      font-size: 0.68rem; font-weight: 300;
+      color: var(--text-dim); margin-top: 0.1rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* playing pip */
+    .ch-tab-pip {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor; opacity: 0;
+      flex-shrink: 0;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    .ch-tab.ch-chill .ch-tab-pip { color: var(--chill); }
+    .ch-tab.ch-comp  .ch-tab-pip { color: var(--comp); }
+    .ch-tab.ch-edu   .ch-tab-pip { color: var(--edu); }
+    .ch-tab.active .ch-tab-pip { opacity: 1; }
+
+    /* sidebar divider */
+    .sidebar-divider {
+      margin: 0.85rem 1rem;
+      height: 1px;
+      background: var(--border-mid);
+      flex-shrink: 0;
+    }
+
+    /* stats strip */
+    .stats-strip {
+      flex-shrink: 0;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border-mid);
+      margin: 0 1rem;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-mid);
+    }
+    .stat-cell {
+      background: var(--bg-card);
+      padding: 0.5rem 0.65rem;
+    }
+    .stat-label {
+      font-size: 0.55rem; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--text-ghost); margin-bottom: 0.18rem;
+    }
+    .stat-value {
+      font-size: 0.8rem; font-weight: 500;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* guide */
+    .guide-wrap {
+      flex: 1; overflow-y: auto;
+      min-height: 0;
+      display: flex; flex-direction: column;
+    }
+
+    .guide-header {
+      flex-shrink: 0;
       display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.85rem 1rem 0.5rem;
     }
-    .sidebar-heading::after { content: ''; flex: 1; height: 1px; background: var(--border-bright); }
+    .guide-header-label {
+      font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-ghost);
+    }
+    .guide-header-line {
+      flex: 1; height: 1px; background: var(--border-mid);
+    }
 
-    /* Channel buttons */
-    .channel-btn {
-      display: flex; align-items: flex-start; gap: 0.85rem; width: 100%;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px;
-      padding: 0.85rem; cursor: pointer; text-align: left; color: var(--ivory);
-      transition: background 0.2s, border-color 0.2s;
-      margin-bottom: 0.55rem; position: relative; overflow: hidden;
-    }
-    .channel-btn:last-child { margin-bottom: 0; }
-    .channel-btn::before {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-      background: currentColor; opacity: 0; transition: opacity 0.2s;
-    }
-    .channel-btn:hover { background: #1c1812; border-color: var(--border-bright); }
-    .channel-btn:hover::before { opacity: 0.4; }
-    .channel-btn.active { background: #1c1812; border-color: var(--gold-dim); }
-    .channel-btn.active::before { opacity: 1; }
-    .channel-btn:disabled { opacity: 0.5; cursor: wait; }
-    .channel-btn.ch-chill { color: #6dbfab; }
-    .channel-btn.ch-comp  { color: #e07070; }
-    .channel-btn.ch-edu   { color: #7ea4d8; }
-
-    .ch-number { font-size: 1.3rem; font-weight: 600; line-height: 1; opacity: 0.35; min-width: 1.3rem; padding-top: 0.1rem; }
-    .channel-btn.active .ch-number { opacity: 1; }
-    .ch-info { flex: 1; }
-    .ch-name { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; color: var(--ivory); margin-bottom: 0.18rem; line-height: 1.2; }
-    .ch-desc { font-size: 0.65rem; color: var(--ivory-dim); line-height: 1.5; }
-    .ch-count { font-size: 0.6rem; color: var(--ivory-ghost); margin-top: 0.28rem; }
-    .ch-pip {
-      width: 7px; height: 7px; border-radius: 50%; background: currentColor;
-      margin-top: 0.35rem; flex-shrink: 0; display: none;
-      animation: blink 1.4s ease-in-out infinite;
-    }
-    .channel-btn.active .ch-pip { display: block; }
-
-    /* Broadcast info rows */
-    .info-row {
-      display: flex; justify-content: space-between; align-items: baseline;
-      padding: 0.3rem 0; border-bottom: 1px solid var(--border); font-size: 0.68rem;
-    }
-    .info-row:last-child { border-bottom: none; }
-    .info-label { color: var(--ivory-dim); }
-    .info-value { color: var(--ivory); letter-spacing: 0.05em; }
-
-    /* ── GUIDE ── */
     .guide-list { flex: 1; }
+
     .guide-empty {
-      font-size: 0.7rem; color: var(--ivory-ghost); font-style: italic;
-      text-align: center; padding: 1.5rem 0; line-height: 1.7;
+      padding: 2rem 1rem;
+      text-align: center;
+      font-size: 0.78rem; font-weight: 300;
+      color: var(--text-ghost); line-height: 1.7;
     }
+
     .guide-item {
       display: grid;
       grid-template-columns: 1fr auto;
       grid-template-rows: auto auto auto;
-      gap: 0.18rem 0.5rem;
-      padding: 0.6rem 1.25rem;
-      margin: 0 -1.25rem;
-      border-bottom: 1px solid var(--border);
+      row-gap: 0.12rem;
+      column-gap: 0.5rem;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border-dim);
       cursor: pointer;
       transition: background 0.15s;
     }
     .guide-item:last-child { border-bottom: none; }
-    .guide-item:hover { background: rgba(255,255,255,0.025); }
+    .guide-item:hover { background: var(--bg-hover); }
+
     .guide-item.guide-now {
-      background: rgba(200,162,74,0.07);
-      border-left: 2px solid var(--gold-dim);
-      padding-left: calc(1.25rem - 2px);
+      background: var(--gold-glow);
+      border-left: 2px solid var(--gold);
+      padding-left: calc(1rem - 2px);
     }
-    .guide-item.guide-now:hover { background: rgba(200,162,74,0.11); }
+    .guide-item.guide-now:hover { background: rgba(226,169,58,0.16); }
+
     .guide-time {
       grid-column: 1; grid-row: 1;
-      font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--gold-dim); line-height: 1;
+      font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-ghost);
     }
-    .guide-item.guide-now .guide-time { color: var(--gold-light); font-weight: 600; }
+    .guide-item.guide-now .guide-time {
+      color: var(--gold-bright);
+    }
     .guide-dur {
       grid-column: 2; grid-row: 1;
-      font-size: 0.58rem; color: var(--ivory-ghost); letter-spacing: 0.04em;
-      font-variant-numeric: tabular-nums; line-height: 1; text-align: right;
+      font-size: 0.6rem; font-weight: 400;
+      color: var(--text-ghost);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
     }
     .guide-title {
       grid-column: 1 / 3; grid-row: 2;
-      font-size: 0.72rem; line-height: 1.3;
+      font-size: 0.78rem; font-weight: 400;
+      color: var(--text-dim); line-height: 1.3;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      color: var(--ivory-dim);
     }
-    .guide-item.guide-now .guide-title { color: var(--ivory); }
+    .guide-item.guide-now .guide-title { color: var(--text); font-weight: 500; }
+
     .guide-channel {
       grid-column: 1 / 3; grid-row: 3;
-      font-size: 0.62rem; color: var(--ivory-ghost); letter-spacing: 0.06em;
-      text-transform: uppercase; line-height: 1.2;
+      font-size: 0.62rem; font-weight: 400;
+      color: var(--text-ghost);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .guide-item.guide-now .guide-channel { color: var(--ivory-dim); }
     .guide-hint {
-      font-size: 0.6rem; color: var(--ivory-ghost); font-style: italic;
-      text-align: center; padding: 0.6rem 0 0;
-      border-top: 1px solid var(--border); margin-top: 0.3rem; line-height: 1.6;
+      padding: 0.75rem 1rem;
+      font-size: 0.65rem; font-weight: 300;
+      color: var(--text-ghost); font-style: italic;
+      text-align: center; line-height: 1.6;
+      border-top: 1px solid var(--border-dim);
     }
 
-    /* ── RESPONSIVE ── */
+    /* ─────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────── */
     @media (max-width: 720px) {
       .page-body { flex-direction: column; }
-      .sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border-bright); max-height: 50vh; }
-      header { padding: 0.8rem 1rem; }
-      .logo-sub { display: none; }
+      .sidebar {
+        width: 100%; border-left: none;
+        border-top: 1px solid var(--border-mid);
+        max-height: 48vh;
+      }
+      header { padding: 0 1rem; }
+      .logo-divider, .logo-sub { display: none; }
     }
   </style>
 </head>
 <body>
 
+  <!-- ═══ HEADER ═══ -->
   <header>
     <div class="logo">
-      <div class="logo-mark">Grandmaster<span> TV</span></div>
-      <div class="logo-sub">Chess Broadcasting Network</div>
+      <div class="logo-mark">Grandmaster<em>TV</em></div>
+      <div class="logo-divider"></div>
+      <div class="logo-sub">Chess Broadcasting</div>
     </div>
-    <div class="header-meta">
-      <div class="live-badge"><div class="live-dot"></div>On Air</div>
+    <div class="header-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>On Air
+      </div>
       <div class="header-clock" id="clock">--:-- --</div>
     </div>
   </header>
 
+  <!-- ═══ PAGE BODY ═══ -->
   <div class="page-body">
 
+    <!-- Main: screen + bars -->
     <div class="main-col">
-      <div class="screen-label">
-        <span class="channel-badge" id="ch-badge">— No Channel —</span>
-        <span class="now-playing-title" id="now-playing-title">Select a channel to begin watching</span>
-        <button class="next-btn" id="next-btn" onclick="advanceQueue()">⟳ Next Video</button>
+
+      <!-- Now-playing bar -->
+      <div class="now-bar">
+        <div class="ch-pill" id="ch-badge">No Channel</div>
+        <div class="now-title" id="now-playing-title">Select a channel to begin watching</div>
+        <button class="skip-btn" id="next-btn" onclick="advanceQueue()">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor">
+            <path d="M2 2l7 4-7 4V2zm8 0h1.5v8H10V2z"/>
+          </svg>
+          Skip
+        </button>
       </div>
 
+      <!-- Video -->
       <div class="screen-container">
         <div class="screen-overlay" id="overlay">
           <div class="spinner" id="spinner"></div>
-          <div class="overlay-king" id="overlay-king">♛</div>
+          <div class="overlay-glyph" id="overlay-king">♛</div>
           <div class="overlay-text"  id="overlay-text">Select a channel to begin</div>
           <div class="overlay-sub"   id="overlay-sub"></div>
         </div>
@@ -308,100 +538,100 @@
         ></iframe>
       </div>
 
-      <div class="footer-bar">
-        <span class="ticker-label">♟ GMTV</span>
-        <div class="ticker-text"><span class="ticker-inner">
-          "Chess is the art of analysis." — Mikhail Botvinnik &nbsp;&nbsp;♙&nbsp;&nbsp;
-          "Every Chess master was once a beginner." — Irving Chernev &nbsp;&nbsp;♙&nbsp;&nbsp;
-          "Chess holds its master in its own bonds." — Albert Einstein &nbsp;&nbsp;♙&nbsp;&nbsp;
-          "Not all artists are Chess players, but all Chess players are artists." — Marcel Duchamp &nbsp;&nbsp;♙&nbsp;&nbsp;
-          "Chess is ruthless: you've got to be prepared to kill people." — Nigel Short &nbsp;&nbsp;♙&nbsp;&nbsp;
-          "The passed Pawn is a criminal, who should be kept under lock and key." — Aaron Nimzowitsch
-        </span></div>
+      <!-- Ticker -->
+      <div class="ticker-bar">
+        <div class="ticker-label">♟ GMTV</div>
+        <div class="ticker-track">
+          <span class="ticker-inner">
+            "Chess is the art of analysis." — Mikhail Botvinnik &nbsp;&nbsp;·&nbsp;&nbsp;
+            "Every Chess master was once a beginner." — Irving Chernev &nbsp;&nbsp;·&nbsp;&nbsp;
+            "Chess holds its master in its own bonds." — Albert Einstein &nbsp;&nbsp;·&nbsp;&nbsp;
+            "Not all artists are Chess players, but all Chess players are artists." — Marcel Duchamp &nbsp;&nbsp;·&nbsp;&nbsp;
+            "Chess is ruthless: you've got to be prepared to kill people." — Nigel Short &nbsp;&nbsp;·&nbsp;&nbsp;
+            "The passed Pawn is a criminal, who should be kept under lock and key." — Nimzowitsch
+          </span>
+        </div>
       </div>
+
     </div>
 
+    <!-- Sidebar -->
     <aside class="sidebar">
 
-      <!-- Channels -->
-      <div class="sidebar-section">
-        <div class="sidebar-heading">Channels</div>
+      <!-- Channel tabs -->
+      <div class="channel-tabs">
 
-        <!--
-          ════════════════════════════════════════════════════════
-          HOW TO SET UP YOUR .TXT FILES
-          ════════════════════════════════════════════════════════
-          Each line = one video, in this format:
-            URL | Title | Duration
-
-          • URL      (required)  any YouTube link format
-          • Title    (optional)  shown in the Guide
-          • Duration (optional)  MM:SS or H:MM:SS — used for Guide start times
-
-          Example lines:
-            https://youtu.be/abc123 | Tal vs Fischer 1959 | 45:23
-            https://youtu.be/xyz | The Immortal Game | 1:02:10
-            https://youtu.be/noDuration | Some Video
-            https://youtu.be/bareUrl
-
-          Lines starting with # are treated as comments and ignored.
-
-          HOST YOUR FILES at a CORS-friendly URL, e.g.:
-            • GitHub Gist  → click Raw → copy that URL
-            • GitHub repo  → use raw.githubusercontent.com URL
-          ════════════════════════════════════════════════════════
-        -->
-
-        <button class="channel-btn ch-chill" data-channel="chill"
+        <button class="ch-tab ch-chill" data-channel="chill"
                 data-txt="https://raw.githubusercontent.com/danfalsej/okay-apps/refs/heads/main/chillchess.txt"
                 onclick="switchChannel(this)">
-          <div class="ch-number">01</div>
-          <div class="ch-info">
-            <div class="ch-name">Chill Chess</div>
-            <div class="ch-desc">Relaxed streams, ambient commentary &amp; casual games</div>
-            <div class="ch-count" id="count-chill"></div>
+          <div class="ch-tab-dot"></div>
+          <div class="ch-tab-info">
+            <div class="ch-tab-name">
+              Chill Chess
+              <span class="ch-tab-count" id="count-chill"></span>
+            </div>
+            <div class="ch-tab-desc">Relaxed streams &amp; casual games</div>
           </div>
-          <div class="ch-pip"></div>
+          <div class="ch-tab-pip"></div>
         </button>
 
-        <button class="channel-btn ch-comp" data-channel="comp"
+        <button class="ch-tab ch-comp" data-channel="comp"
                 data-txt="https://raw.githubusercontent.com/danfalsej/okay-apps/refs/heads/main/championchess.txt"
                 onclick="switchChannel(this)">
-          <div class="ch-number">02</div>
-          <div class="ch-info">
-            <div class="ch-name">Competitive Chess</div>
-            <div class="ch-desc">Tournaments, top players &amp; high-stakes battles</div>
-            <div class="ch-count" id="count-comp"></div>
+          <div class="ch-tab-dot"></div>
+          <div class="ch-tab-info">
+            <div class="ch-tab-name">
+              Competitive Chess
+              <span class="ch-tab-count" id="count-comp"></span>
+            </div>
+            <div class="ch-tab-desc">Tournaments &amp; high-stakes battles</div>
           </div>
-          <div class="ch-pip"></div>
+          <div class="ch-tab-pip"></div>
         </button>
 
-        <button class="channel-btn ch-edu" data-channel="edu"
+        <button class="ch-tab ch-edu" data-channel="edu"
                 data-txt="https://raw.githubusercontent.com/danfalsej/okay-apps/refs/heads/main/educhess.txt"
                 onclick="switchChannel(this)">
-          <div class="ch-number">03</div>
-          <div class="ch-info">
-            <div class="ch-name">Educational Chess</div>
-            <div class="ch-desc">Lessons, tactics, openings &amp; strategy for all levels</div>
-            <div class="ch-count" id="count-edu"></div>
+          <div class="ch-tab-dot"></div>
+          <div class="ch-tab-info">
+            <div class="ch-tab-name">
+              Educational Chess
+              <span class="ch-tab-count" id="count-edu"></span>
+            </div>
+            <div class="ch-tab-desc">Lessons, openings &amp; strategy</div>
           </div>
-          <div class="ch-pip"></div>
+          <div class="ch-tab-pip"></div>
         </button>
+
       </div>
 
-      <!-- Broadcast Info -->
-      <div class="sidebar-section">
-        <div class="sidebar-heading">Broadcast Info</div>
-        <div class="info-row"><span class="info-label">Network</span><span class="info-value">GMTV-1</span></div>
-        <div class="info-row"><span class="info-label">Format</span> <span class="info-value">HD 16:9</span></div>
-        <div class="info-row"><span class="info-label">Channel</span><span class="info-value" id="info-channel">—</span></div>
-        <div class="info-row"><span class="info-label">Videos</span> <span class="info-value" id="info-count">—</span></div>
-        <div class="info-row"><span class="info-label">Status</span> <span class="info-value" id="info-status">Standby</span></div>
+      <!-- Stats strip -->
+      <div class="sidebar-divider"></div>
+      <div class="stats-strip">
+        <div class="stat-cell">
+          <div class="stat-label">Channel</div>
+          <div class="stat-value" id="info-channel">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Videos</div>
+          <div class="stat-value" id="info-count">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Status</div>
+          <div class="stat-value" id="info-status">Standby</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Network</div>
+          <div class="stat-value">GMTV-1</div>
+        </div>
       </div>
 
       <!-- Guide -->
-      <div class="sidebar-section guide-section">
-        <div class="sidebar-heading">Up Next</div>
+      <div class="guide-wrap">
+        <div class="guide-header">
+          <div class="guide-header-label">Up Next</div>
+          <div class="guide-header-line"></div>
+        </div>
         <div class="guide-list" id="guide-list">
           <div class="guide-empty">Select a channel<br>to see what's on</div>
         </div>
@@ -413,27 +643,21 @@
   <script>
     // ══════════════════════════════════════════════════════════════
     //  END-OF-VIDEO DETECTION via postMessage
-    //  YouTube sends state-change messages to the parent window
-    //  when the iframe has ?enablejsapi=1 in its URL.
-    //  State 0 = ended. No IFrame API script needed.
     // ══════════════════════════════════════════════════════════════
     window.addEventListener('message', function (e) {
       if (e.origin !== 'https://www.youtube.com') return;
       try {
         const data = JSON.parse(e.data);
-        // YouTube sends {event:'onStateChange', info: <state>}
-        if (data.event === 'onStateChange' && data.info === 0) {
-          advanceQueue();
-        }
-      } catch (_) { /* non-JSON messages from other iframes — ignore */ }
+        if (data.event === 'onStateChange' && data.info === 0) advanceQueue();
+      } catch (_) {}
     });
 
     // ══════════════════════════════════════════════════════════════
     //  STATE
     // ══════════════════════════════════════════════════════════════
-    let queue      = [];   // shuffled array of video objects for active channel
-    let queueIndex = -1;   // current position in queue
-    const videoCache = {}; // txtUrl → [video objects]
+    let queue      = [];
+    let queueIndex = -1;
+    const videoCache = {};
 
     // ══════════════════════════════════════════════════════════════
     //  PARSING UTILITIES
@@ -449,7 +673,6 @@
       return null;
     }
 
-    // "45:23" → 2723 s  |  "1:02:45" → 3765 s  |  else null
     function parseDuration(str) {
       if (!str) return null;
       str = str.trim();
@@ -459,7 +682,6 @@
       return parts[0] * 60 + parts[1];
     }
 
-    // 2723 → "45:23"  |  3765 → "1:02:45"
     function formatDuration(secs) {
       if (secs == null) return '?';
       const h = Math.floor(secs / 3600);
@@ -530,7 +752,6 @@
       if (!queue.length) return;
       queueIndex++;
       if (queueIndex >= queue.length) {
-        // Reshuffle, avoiding the same video repeating at the seam
         const lastId = queue[queue.length - 1].videoId;
         queue = shuffle(queue);
         if (queue[0].videoId === lastId && queue.length > 1) {
@@ -558,12 +779,11 @@
     }
 
     // ══════════════════════════════════════════════════════════════
-    //  VIDEO LOADING — plain iframe, same as the working version
+    //  VIDEO LOADING
     // ══════════════════════════════════════════════════════════════
     function loadVideo(videoId) {
       hideOverlay();
       document.getElementById('next-btn').classList.add('visible');
-      // enablejsapi=1 lets YouTube send postMessage state-change events
       document.getElementById('video-iframe').src =
         `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
     }
@@ -580,8 +800,7 @@
       }
 
       const MAX_ITEMS = 10;
-      const now = new Date();
-      let cursor = new Date(now);
+      let cursor = new Date();
       let timeUnknown = false;
       let html = '';
 
@@ -592,9 +811,7 @@
         const isNow = offset === 0;
 
         const timeStr = isNow ? 'Now Playing'
-                      : timeUnknown ? '~' + formatTime(cursor)
-                      : formatTime(cursor);
-
+                      : (timeUnknown ? '~ ' : '') + formatTime(cursor);
         const durStr = v.duration != null ? formatDuration(v.duration) : '?';
 
         html += `
@@ -612,37 +829,40 @@
       }
 
       if (timeUnknown) {
-        html += `<div class="guide-hint">Add durations to your .txt file<br>for exact start times</div>`;
+        html += `<div class="guide-hint">Add durations to your .txt files for exact start times</div>`;
       }
 
       el.innerHTML = html;
     }
 
-    // Refresh guide start times every minute so they stay accurate
     setInterval(renderGuide, 60000);
 
     // ══════════════════════════════════════════════════════════════
     //  UI HELPERS
     // ══════════════════════════════════════════════════════════════
-    function showOverlay(king, text, sub, loading) {
+    function showOverlay(glyph, text, sub, loading) {
       document.getElementById('overlay').classList.remove('hidden');
-      const kingEl = document.getElementById('overlay-king');
-      kingEl.style.display = loading ? 'none' : '';
-      kingEl.textContent = king;
+      const glyphEl = document.getElementById('overlay-king');
+      glyphEl.style.display = loading ? 'none' : '';
+      glyphEl.textContent = glyph;
       document.getElementById('overlay-text').textContent = text;
       document.getElementById('overlay-sub').textContent  = sub || '';
       document.getElementById('spinner').classList.toggle('visible', !!loading);
     }
-    function hideOverlay() { document.getElementById('overlay').classList.add('hidden'); }
-    function setButtonsDisabled(d) { document.querySelectorAll('.channel-btn').forEach(b => b.disabled = d); }
+    function hideOverlay() {
+      document.getElementById('overlay').classList.add('hidden');
+    }
+    function setButtonsDisabled(d) {
+      document.querySelectorAll('.ch-tab').forEach(b => b.disabled = d);
+    }
 
     // ══════════════════════════════════════════════════════════════
     //  CHANNEL SWITCHING
     // ══════════════════════════════════════════════════════════════
     const CHANNEL_META = {
-      chill: { badgeClass: 'chill', badgeText: 'CH 01 · CHILL',       name: 'Chill Chess'       },
-      comp:  { badgeClass: 'comp',  badgeText: 'CH 02 · COMPETITIVE', name: 'Competitive Chess' },
-      edu:   { badgeClass: 'edu',   badgeText: 'CH 03 · EDUCATIONAL', name: 'Educational Chess' },
+      chill: { pillClass: 'chill', pillText: 'Chill Chess',        name: 'Chill'       },
+      comp:  { pillClass: 'comp',  pillText: 'Competitive Chess',  name: 'Competitive' },
+      edu:   { pillClass: 'edu',   pillText: 'Educational Chess',  name: 'Educational' },
     };
 
     async function switchChannel(btn) {
@@ -650,15 +870,14 @@
       const txtUrl = btn.dataset.txt;
       const meta   = CHANNEL_META[key];
 
-      document.querySelectorAll('.channel-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.ch-tab').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const badge = document.getElementById('ch-badge');
-      badge.className   = `channel-badge ${meta.badgeClass}`;
-      badge.textContent = meta.badgeText;
+      const pill = document.getElementById('ch-badge');
+      pill.className   = `ch-pill ${meta.pillClass}`;
+      pill.textContent = meta.pillText;
       document.getElementById('info-channel').textContent = meta.name;
 
-      // Already cached — re-shuffle and play immediately
       if (videoCache[txtUrl]) {
         initQueue(videoCache[txtUrl]);
         document.getElementById('info-count').textContent = queue.length;
@@ -666,7 +885,6 @@
         return;
       }
 
-      // Show loading state
       showOverlay('', 'Tuning in…', 'Fetching video list', true);
       setButtonsDisabled(true);
       document.getElementById('now-playing-title').textContent = 'Loading…';
@@ -681,7 +899,7 @@
         initQueue(videos);
 
         const countEl = document.getElementById(`count-${key}`);
-        if (countEl) countEl.textContent = `${videos.length} video${videos.length !== 1 ? 's' : ''}`;
+        if (countEl) countEl.textContent = `${videos.length}`;
         document.getElementById('info-count').textContent = videos.length;
 
         advanceQueue();
