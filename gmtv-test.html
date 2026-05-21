@@ -215,7 +215,7 @@
     .guide-item {
       display: grid;
       grid-template-columns: 1fr auto;
-      grid-template-rows: auto auto;
+      grid-template-rows: auto auto auto;
       gap: 0.18rem 0.5rem;
       padding: 0.6rem 1.25rem;
       margin: 0 -1.25rem;
@@ -249,6 +249,12 @@
       color: var(--ivory-dim);
     }
     .guide-item.guide-now .guide-title { color: var(--ivory); }
+    .guide-channel {
+      grid-column: 1 / 3; grid-row: 3;
+      font-size: 0.62rem; color: var(--ivory-ghost); letter-spacing: 0.06em;
+      text-transform: uppercase; line-height: 1.2;
+    }
+    .guide-item.guide-now .guide-channel { color: var(--ivory-dim); }
     .guide-hint {
       font-size: 0.6rem; color: var(--ivory-ghost); font-style: italic;
       text-align: center; padding: 0.6rem 0 0;
@@ -347,7 +353,7 @@
         -->
 
         <button class="channel-btn ch-chill" data-channel="chill"
-                data-txt="https://raw.githubusercontent.com/danfalsej/okay-apps/refs/heads/main/chillchess.txt"
+                data-txt="PASTE_RAW_TXT_URL_FOR_CHILL_HERE"
                 onclick="switchChannel(this)">
           <div class="ch-number">01</div>
           <div class="ch-info">
@@ -472,12 +478,14 @@
       line = (line || '').trim();
       if (!line || line.startsWith('#')) return null;
       const parts = line.split('|').map(s => s.trim());
-      const videoId = extractVideoId(parts[0]);
+      // Format: channel | URL | title | duration
+      const videoId = extractVideoId(parts[1]);
       if (!videoId) return null;
       return {
+        channel:  parts[0] || '',
         videoId,
-        title:    parts[1] || 'Untitled Video',
-        duration: parseDuration(parts[2]),
+        title:    parts[2] || 'Untitled Video',
+        duration: parseDuration(parts[3]),
       };
     }
 
@@ -594,6 +602,7 @@
             <div class="guide-time">${timeStr}</div>
             <div class="guide-dur">${durStr}</div>
             <div class="guide-title">${escHtml(v.title)}</div>
+            ${v.channel ? `<div class="guide-channel">${escHtml(v.channel)}</div>` : ''}
           </div>`;
 
         if (!timeUnknown) {
