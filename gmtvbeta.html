@@ -724,7 +724,7 @@
       const el = document.getElementById('guide-list');
       if (!el) return;
       if (!pos) {
-        el.innerHTML = '<div class="guide-empty">Select a channel<br>to see what's on</div>';
+        el.innerHTML = '<div class="guide-empty">Select a channel<br>to see what\'s on</div>';
         return;
       }
 
@@ -832,8 +832,7 @@
       if (videoCache[url]) return videoCache[url];
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const videos = (await res.text()).split('
-').map(parseLine).filter(Boolean);
+      const videos = (await res.text()).split('\n').map(parseLine).filter(Boolean);
       if (!videos.length) throw new Error('No valid YouTube URLs found in file');
       videoCache[url] = videos;
       return videos;
