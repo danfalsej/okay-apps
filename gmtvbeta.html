@@ -616,6 +616,7 @@
     let   activeChannel = null;   // key of the currently-selected channel
     let   activeVideos  = [];     // raw parsed videos for active channel
     let   syncInterval  = null;   // interval for progress ticker
+    let   advanceTimer  = null;   // setTimeout handle for end-of-video advance
 
     // ── end-of-video via postMessage ───────────────────────────────
     // When a video ends, recalculate from the epoch rather than
@@ -674,10 +675,12 @@
 
     // ── Tune: load the correct video at the correct position ───────
     function tuneToChannel(key, videos) {
+      // Cancel any pending advance timer from the previous video
+      if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+
       const seed = CHANNEL_SEEDS[key];
       const pos  = getCurrentPosition(videos, seed);
 
-      // Check for missing durations
       const missingDurations = videos.some(v => v.duration === null);
 
       loadVideo(pos.video.videoId, pos.offsetSeconds);
@@ -686,6 +689,14 @@
 
       renderGuide(pos, missingDurations);
       startProgressTicker(pos);
+
+      // Schedule the next tune based on how much of this video remains.
+      // This is more reliable than postMessage from YouTube.
+      if (pos.video.duration) {
+        const remainingMs = (pos.video.duration - pos.offsetSeconds) * 1000;
+        // Add a small buffer so the iframe has finished before we swap
+        advanceTimer = setTimeout(() => tuneToChannel(key, videos), remainingMs + 500);
+      }
     }
 
     // ── Video loading ──────────────────────────────────────────────
