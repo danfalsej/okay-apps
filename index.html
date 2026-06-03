@@ -1,1 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Okay Apps</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #08090A;
+      --surface: #111214;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(255,255,255,0.15);
+      --ink: #F0EDE8;
+      --muted: rgba(240,237,232,0.38);
+      --accent: #C8B89A;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+    }
+
+    /* Radial glow behind content */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(200,184,154,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    /* ── Header ── */
+    header {
+      margin-bottom: 64px;
+      opacity: 0;
+      animation: appear 0.8s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+
+    .tagline {
+      margin-top: 10px;
+      font-size: 0.8125rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.5;
+      margin: 20px 0;
+    }
+
+    /* ── App List ── */
+    .apps {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 26px 0;
+      text-decoration: none;
+      color: var(--ink);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      opacity: 0;
+      transition: color 0.2s;
+    }
+
+    .app-card:first-child {
+      border-top: 1px solid var(--border);
+    }
+
+    .app-card::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.6;
+      transition: width 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .app-card:hover::after {
+      width: 100%;
+    }
+
+    .app-card:hover .app-name {
+      color: var(--accent);
+    }
+
+    .app-card:hover .arrow {
+      transform: translate(3px, -3px);
+      opacity: 0.9;
+    }
+
+    .card-left {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .app-number {
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .app-name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: 1.4rem;
+      letter-spacing: -0.01em;
+      transition: color 0.2s;
+    }
+
+    .app-desc {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      font-weight: 300;
+      letter-spacing: 0.01em;
+    }
+
+    .arrow {
+      font-size: 1rem;
+      color: var(--muted);
+      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), opacity 0.2s;
+      opacity: 0.4;
+      flex-shrink: 0;
+      margin-left: 20px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 48px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      opacity: 0;
+      animation: appear 0.6s ease 1s forwards;
+    }
+
+    /* ── Animations ── */
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .app-card:nth-child(1) { animation: appear 0.6s cubic-bezier(0.16,1,0.3,1) 0.35s forwards; }
+    .app-card:nth-child(2) { animation: appear 0.6s cubic-bezier(0.16,1,0.3,1) 0.48s forwards; }
+    .app-card:nth-child(3) { animation: appear 0.6s cubic-bezier(0.16,1,0.3,1) 0.61s forwards; }
+
+    @media (max-width: 480px) {
+      .app-name { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <header>
+      <h1>Okay Apps</h1>
+      <div class="divider"></div>
+      <p class="tagline">A small suite of useful tools</p>
+    </header>
+
+    <div class="apps">
+
+      <a class="app-card" href="https://grandmastertv.com" target="_blank" rel="noopener">
+        <div class="card-left">
+          <span class="app-number">01</span>
+          <span class="app-name">GrandmasterTV</span>
+          <span class="app-desc">Chess broadcasts &amp; live game coverage</span>
+        </div>
+        <span class="arrow">↗</span>
+      </a>
+
+      <a class="app-card" href="#" target="_blank" rel="noopener">
+        <div class="card-left">
+          <span class="app-number">02</span>
+          <span class="app-name">Okay Weather</span>
+          <span class="app-desc">Clean, no-fuss weather at a glance</span>
+        </div>
+        <span class="arrow">↗</span>
+      </a>
+
+      <a class="app-card" href="#" target="_blank" rel="noopener">
+        <div class="card-left">
+          <span class="app-number">03</span>
+          <span class="app-name">Okay Stocks</span>
+          <span class="app-desc">Simple stock tracking without the noise</span>
+        </div>
+        <span class="arrow">↗</span>
+      </a>
+
+    </div>
+
+    <footer>© 2026 Okay Apps</footer>
+
+  </div>
+</body>
+</html>
 
