@@ -41,13 +41,19 @@
   .status-dot { width: 6px; height: 6px; border-radius: 50%; }
   .last-updated { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
 
-  /* API KEY BANNER */
-  .api-banner {
-    background: #fffbf0; border-bottom: 1px solid #f0e0a0; padding: 10px 32px;
-    display: flex; align-items: center; gap: 12px; font-size: 13px; color: #7a6020; flex-wrap: wrap;
+  /* FOOTER API KEY SECTION */
+  footer { padding: 24px 32px; border-top: 1px solid var(--border); }
+  .footer-credit { text-align: center; font-size: 12px; color: var(--muted); margin-top: 16px; }
+  .footer-credit a { color: var(--muted); }
+
+  .footer-api-section {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 20px; font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
   }
-  .api-banner a { color: #b07820; font-weight: 500; }
-  .api-key-input-wrap { display: flex; gap: 8px; margin-left: auto; }
+  .footer-api-section a { color: var(--accent); font-weight: 500; }
+  .footer-api-section.has-key { background: #f0faf4; border-color: #c0e0cc; color: #2a6040; }
+  .api-key-input-wrap { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
   .api-key-input-wrap input {
     font-family: 'DM Mono', monospace; font-size: 12px; padding: 5px 10px;
     border: 1px solid #e0d0a0; border-radius: 6px; background: white; width: 220px; outline: none; color: var(--text);
@@ -124,11 +130,11 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* STOCK GRID */
-  .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 40px; }
+  .stock-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 40px; }
 
   .stock-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 14px; box-shadow: var(--shadow); cursor: pointer;
+    padding: 12px 16px; box-shadow: var(--shadow); cursor: pointer;
     transition: border-color 0.15s, box-shadow 0.15s;
     animation: fadeUp 0.3s ease both;
   }
@@ -136,18 +142,21 @@
   .stock-card:active { opacity: 0.85; }
   .stock-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,25,22,0.06); }
 
-  .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .ticker-symbol { font-size: 15px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.3px; }
-  .company-name { font-size: 11px; color: var(--muted); margin-top: 1px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+  /* Single-row layout: ticker left, price+change right */
+  .card-top {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .card-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .ticker-symbol { font-size: 15px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.3px; flex-shrink: 0; }
+  .company-name { font-size: 11px; color: var(--muted); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .price-main { font-size: 16px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.3px; }
   .change-badge { padding: 3px 7px; border-radius: 20px; font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace; white-space: nowrap; }
   .change-badge.up { background: var(--up-bg); color: var(--up); }
   .change-badge.down { background: var(--down-bg); color: var(--down); }
   .change-badge.neutral { background: var(--surface2); color: var(--neutral); }
-
-  .price-main { font-size: 20px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; margin-bottom: 2px; }
-  .price-change-row { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
-  .price-change-row .up { color: var(--up); }
-  .price-change-row .down { color: var(--down); }
+  /* hide the old price-change-row on collapsed cards */
+  .price-change-row { display: none; }
 
   /* EXPANDED SECTION (visible only when card is selected) */
   .card-expanded {
@@ -212,10 +221,7 @@
 
   @media (max-width: 600px) {
     header, main, .portfolio-banner { padding-left: 16px; padding-right: 16px; }
-    .api-banner { padding-left: 16px; padding-right: 16px; }
-    .api-key-input-wrap { margin-left: 0; }
-    .stock-grid { grid-template-columns: 1fr 1fr; }
-    .port-stat { padding: 0 16px; }
+    .port-stat { padding: 0 14px; }
   }
 </style>
 </head>
@@ -231,18 +237,6 @@
     <div class="last-updated" id="lastUpdated">—</div>
   </div>
 </header>
-
-<!-- API KEY BANNER -->
-<div class="api-banner" id="apiBanner">
-  ⚠️ No API key set. Get a free key at
-  <a href="https://twelvedata.com/apikey" target="_blank">twelvedata.com</a>
-  (no credit card needed) — then paste it here:
-  <div class="api-key-input-wrap">
-    <input type="text" id="apiKeyInput" placeholder="Paste your Twelve Data key" />
-    <button class="btn-sm" onclick="saveApiKey()">Save & Load</button>
-    <button class="btn-sm-outline" id="changeKeyBtn" onclick="showChangeBanner()" style="display:none">Change Key</button>
-  </div>
-</div>
 
 <!-- PORTFOLIO SUMMARY -->
 <div class="portfolio-banner hidden" id="portfolioBanner">
@@ -286,8 +280,12 @@
 </main>
 
 <footer>
-  Market data provided by <a href="https://twelvedata.com" target="_blank">Twelve Data</a>.
-  Data may be delayed. Not financial advice.
+  <div id="apiBanner" class="footer-api-section">
+    <!-- populated by JS -->
+  </div>
+  <div class="footer-credit">
+    Market data by <a href="https://twelvedata.com" target="_blank">Twelve Data</a>. Data may be delayed. Not financial advice.
+  </div>
 </footer>
 
 <script>
@@ -316,40 +314,38 @@ function init() {
   }
 }
 
-// ─── API KEY BANNER ───────────────────────────────────────────────────────────
+// ─── API KEY SECTION (footer) ─────────────────────────────────────────────────
 function showBanner() {
-  const banner = document.getElementById('apiBanner');
-  banner.style.display = 'flex';
-  document.getElementById('apiKeyInput').value = '';
-  document.getElementById('changeKeyBtn').style.display = 'none';
+  const el = document.getElementById('apiBanner');
+  el.className = 'footer-api-section';
+  el.innerHTML = `
+    🔑 No API key set. Get a free key at <a href="https://twelvedata.com/apikey" target="_blank">twelvedata.com</a> — no credit card needed.
+    <div class="api-key-input-wrap">
+      <input type="text" id="apiKeyInput" placeholder="Paste your Twelve Data key"
+        style="font-family:'DM Mono',monospace;font-size:12px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:white;width:200px;outline:none;color:var(--text)" />
+      <button class="btn-sm" onclick="saveApiKey()">Save & Load</button>
+    </div>`;
 }
 
 function hideBanner() {
-  const banner = document.getElementById('apiBanner');
-  // Show a compact "key saved" version instead of full banner
-  banner.innerHTML = `
+  const el = document.getElementById('apiBanner');
+  el.className = 'footer-api-section has-key';
+  el.innerHTML = `
     ✅ Twelve Data key active.
-    <button class="btn-sm-outline" style="margin-left:8px" onclick="showChangeBanner()">Change Key</button>
-  `;
-  banner.style.background = '#f0faf4';
-  banner.style.borderBottomColor = '#c0e0cc';
-  banner.style.color = '#2a6040';
+    <button class="btn-sm-outline" style="margin-left:auto" onclick="showChangeBanner()">Change Key</button>`;
 }
 
 function showChangeBanner() {
-  const banner = document.getElementById('apiBanner');
-  banner.style.display = 'flex';
-  banner.style.background = '#fffbf0';
-  banner.style.borderBottomColor = '#f0e0a0';
-  banner.style.color = '#7a6020';
-  banner.innerHTML = `
+  const el = document.getElementById('apiBanner');
+  el.className = 'footer-api-section';
+  el.innerHTML = `
     🔑 Enter a new Twelve Data API key:
     <div class="api-key-input-wrap">
-      <input type="text" id="apiKeyInput" placeholder="Paste your key here" style="font-family:'DM Mono',monospace;font-size:12px;padding:5px 10px;border:1px solid #e0d0a0;border-radius:6px;background:white;width:220px;outline:none;color:var(--text)" />
+      <input type="text" id="apiKeyInput" placeholder="Paste your key here"
+        style="font-family:'DM Mono',monospace;font-size:12px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:white;width:200px;outline:none;color:var(--text)" />
       <button class="btn-sm" onclick="saveApiKey()">Save & Reload</button>
       <button class="btn-sm-outline" onclick="hideBanner()">Cancel</button>
-    </div>
-  `;
+    </div>`;
 }
 
 function saveApiKey() {
@@ -634,15 +630,14 @@ function renderGrid() {
     return `
       <div class="stock-card ${selected}" style="animation-delay:${delay}" onclick="selectCard('${ticker}')">
         <div class="card-top">
-          <div>
+          <div class="card-left">
             <div class="ticker-symbol">${ticker}</div>
             <div class="company-name">${companyName(ticker)}</div>
           </div>
-          <div class="change-badge ${dir}">${sign}${fmt(pct)}%</div>
-        </div>
-        <div class="price-main">$${fmt(d.price)}</div>
-        <div class="price-change-row">
-          <span class="${dir}">${sign}$${fmt(Math.abs(d.change))} from open</span>
+          <div class="card-right">
+            <div class="price-main">$${fmt(d.price)}</div>
+            <div class="change-badge ${dir}">${sign}${fmt(pct)}%</div>
+          </div>
         </div>
         <div class="card-expanded">
           <div class="shares-row" onclick="event.stopPropagation()">
