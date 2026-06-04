@@ -498,12 +498,15 @@ async function fetchQuote(ticker) {
     const res = await fetch(url);
     const q = await res.json();
 
+    // Twelve Data returns status:'error' for bad keys, unknown tickers, rate limits
     if (q.status === 'error') {
-      if (q.code === 429) throw new Error('rate_limit');
+      const code = parseInt(q.code);
+      if (code === 429) throw new Error('rate_limit');
+      if (code === 401 || code === 403) throw new Error('bad_key');
       throw new Error('no_data');
     }
 
-    const price = parseFloat(q.close);   // "close" = latest/current price in Twelve Data's quote
+    const price = parseFloat(q.close);  // "close" = most recent price
     const open  = parseFloat(q.open);
 
     if (isNaN(price) || isNaN(open)) throw new Error('no_data');
@@ -518,7 +521,12 @@ async function fetchQuote(ticker) {
 async function loadAll() {
   if (!apiKey) return;
   renderSkeletons();
-  const results = await Promise.all(watchlist.map(t => fetchQuote(t)));
+  // Stagger requests 300ms apart to stay within Twelve Data's free tier rate limit
+  const results = [];
+  for (let i = 0; i < watchlist.length; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 300));
+    results.push(await fetchQuote(watchlist[i]));
+  }
   results.forEach(d => { stockData[d.ticker] = d; });
   updateTimestamp();
   renderGrid();
@@ -627,8 +635,8 @@ function renderGrid() {
       </div>`;
 
     if (d.error) {
-      const msg = d.error === 'rate_limit'
-        ? 'Rate limit reached (800 req/day on free tier). Wait a moment or check your key.'
+      const msg = d.error === 'rate_limit' ? 'Rate limit reached — try refreshing in a moment.'
+        : d.error === 'bad_key' ? 'Invalid API key — check the key in the footer.'
         : 'Could not load data — check the ticker symbol.';
       return `<div class="error-card" style="animation-delay:${delay}"><strong>${ticker}</strong><span>${msg}</span></div>`;
     }
@@ -686,7 +694,7 @@ function closeDetail() {
   selectedTicker = null;
   renderGrid();
 }
- 
+
 // ─── START ────────────────────────────────────────────────────────────────────
 init();
 </script>
