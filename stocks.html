@@ -375,7 +375,7 @@
 </main>
 
 <footer>
-  Market data provided by <a href="https://finnhub.io" target="_blank">Finnhub</a>.
+  Market data provided by <a href="https://alpaca.markets" target="_blank">Alpaca</a>.
   Real-time US market data. Not financial advice.
 </footer>
 
@@ -442,14 +442,7 @@ function removeTicker(t) {
   updatePortfolio();
 }
 
-function saveApiKey() {
-  const val = document.getElementById('apiKeyInput').value.trim();
-  if (!val) return;
-  apiKey = val;
-  localStorage.setItem(STORAGE_KEY_APIKEY, apiKey);
-  document.getElementById('apiBanner').style.display = 'none';
-  refreshAll();
-}
+// saveApiKey removed — keys are baked in for Alpaca
 
 // ─── SHARES ───────────────────────────────────────────────────────────────────
 function setShares(ticker, val) {
@@ -550,48 +543,42 @@ function updatePortfolio() {
 // ─── DATA FETCHING (Finnhub) ──────────────────────────────────────────────────
 const profileCache = {};
 
-async function fetchProfile(ticker) {
-  if (profileCache[ticker]) return profileCache[ticker];
-  try {
-    const res = await fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`);
-    const json = await res.json();
-    profileCache[ticker] = json.name || ticker;
-  } catch { profileCache[ticker] = ticker; }
-  return profileCache[ticker];
-}
+// ─── DATA FETCHING (Alpaca) ───────────────────────────────────────────────────
+const profileCache = {};
+
+const ALPACA_HEADERS = {
+  'APCA-API-KEY-ID':     ALPACA_KEY_ID,
+  'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
+};
 
 async function fetchQuote(ticker) {
   try {
-    const [quoteRes, profileRes] = await Promise.all([
-      fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`),
-      fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`)
+    // Alpaca: latest bar (OHLCV) + latest trade (real-time price) + previous close snapshot
+    const [snapRes] = await Promise.all([
+      fetch(`${ALPACA_DATA_URL}/stocks/${ticker}/snapshot`, { headers: ALPACA_HEADERS }),
     ]);
-    const q = await quoteRes.json();
-    const p = await profileRes.json();
 
-    // Finnhub returns all zeros for unknown tickers
-    if (!q.c || q.c === 0) throw new Error('no_data');
+    if (snapRes.status === 422 || snapRes.status === 404) throw new Error('no_data');
+    if (snapRes.status === 429) throw new Error('rate_limit');
+    if (!snapRes.ok) throw new Error('no_data');
 
-    const price     = q.c;   // current price
-    const prevClose = q.pc;  // previous close
-    const change    = price - prevClose;
-    const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
+    const snap = await snapRes.json();
 
-    if (p.name) profileCache[ticker] = p.name;
+    // Alpaca snapshot shape: { latestTrade, latestQuote, minuteBar, dailyBar, prevDailyBar }
+    const price     = snap.latestTrade?.p ?? snap.dailyBar?.c;
+    const prevClose = snap.prevDailyBar?.c;
+    const open      = snap.dailyBar?.o;
+    const high      = snap.dailyBar?.h;
+    const low       = snap.dailyBar?.l;
+    const volume    = snap.dailyBar?.v;
+    const barDate   = snap.dailyBar?.t ? snap.dailyBar.t.slice(0, 10) : null;
 
-    return {
-      ticker,
-      price,
-      open:      q.o,
-      high:      q.h,
-      low:       q.l,
-      prevClose,
-      change,
-      changePct,
-      volume:    null,   // not in Finnhub /quote; would need separate call
-      latestDay: new Date(q.t * 1000).toISOString().slice(0, 10),
-      companyName: p.name || ticker,
-    };
+    if (!price) throw new Error('no_data');
+
+    const change    = prevClose ? price - prevClose : 0;
+    const changePct = prevClose ? (change / prevClose) * 100 : 0;
+
+    return { ticker, price, open, high, low, prevClose, change, changePct, volume, latestDay: barDate };
   } catch (e) { return { ticker, error: e.message }; }
 }
 
