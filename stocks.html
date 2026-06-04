@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pulse — Stock Dashboard</title>
+<title>Okay Stocks — Stock Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,16 +29,9 @@
 
   /* HEADER */
   header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between; height: 60px;
+    position: sticky; top: 0; z-index: 100;
   }
   .logo { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
   .logo-dot { width: 8px; height: 8px; background: var(--up); border-radius: 50%; animation: blink 2s ease-in-out infinite; }
@@ -48,76 +41,45 @@
   .status-dot { width: 6px; height: 6px; border-radius: 50%; }
   .last-updated { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
 
-  /* PORTFOLIO SUMMARY BANNER */
-  .portfolio-banner {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    gap: 0;
-    overflow-x: auto;
-  }
-  .portfolio-banner.hidden { display: none; }
-
-  .port-stat {
-    padding: 0 28px;
-    border-right: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .port-stat:first-child { padding-left: 0; }
-  .port-stat:last-child { border-right: none; }
-
-  .port-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--muted);
-    font-weight: 500;
-    margin-bottom: 5px;
-  }
-  .port-value {
-    font-size: 22px;
-    font-weight: 600;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: -0.5px;
-  }
-  .port-value.up { color: var(--up); }
-  .port-value.down { color: var(--down); }
-  .port-sub {
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    margin-top: 2px;
-  }
-  .port-sub.up { color: var(--up); }
-  .port-sub.down { color: var(--down); }
-
-  .port-hint {
-    margin-left: auto;
-    padding-left: 28px;
-    font-size: 12px;
-    color: var(--muted);
-    flex-shrink: 0;
-    font-style: italic;
-  }
-
-  /* API BANNER */
+  /* API KEY BANNER */
   .api-banner {
     background: #fffbf0; border-bottom: 1px solid #f0e0a0; padding: 10px 32px;
-    display: flex; align-items: center; gap: 12px; font-size: 13px; color: #7a6020;
+    display: flex; align-items: center; gap: 12px; font-size: 13px; color: #7a6020; flex-wrap: wrap;
   }
   .api-banner a { color: #b07820; font-weight: 500; }
   .api-key-input-wrap { display: flex; gap: 8px; margin-left: auto; }
   .api-key-input-wrap input {
     font-family: 'DM Mono', monospace; font-size: 12px; padding: 5px 10px;
-    border: 1px solid #e0d0a0; border-radius: 6px; background: white; width: 200px; outline: none; color: var(--text);
+    border: 1px solid #e0d0a0; border-radius: 6px; background: white; width: 220px; outline: none; color: var(--text);
   }
   .btn-sm {
     padding: 5px 12px; font-size: 12px; font-weight: 500; border: none; border-radius: 6px;
     cursor: pointer; background: #1a1916; color: white; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
   }
   .btn-sm:hover { opacity: 0.8; }
+  .btn-sm-outline {
+    padding: 5px 12px; font-size: 12px; font-weight: 500; border: 1px solid #e0d0a0; border-radius: 6px;
+    cursor: pointer; background: transparent; color: #7a6020; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
+  }
+  .btn-sm-outline:hover { opacity: 0.7; }
+
+  /* PORTFOLIO SUMMARY */
+  .portfolio-banner {
+    background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 32px;
+    display: flex; align-items: center; gap: 0; overflow-x: auto;
+  }
+  .portfolio-banner.hidden { display: none; }
+  .port-stat { padding: 0 28px; border-right: 1px solid var(--border); flex-shrink: 0; }
+  .port-stat:first-child { padding-left: 0; }
+  .port-stat:last-child { border-right: none; }
+  .port-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 500; margin-bottom: 5px; }
+  .port-value { font-size: 22px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; }
+  .port-value.up { color: var(--up); }
+  .port-value.down { color: var(--down); }
+  .port-sub { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+  .port-sub.up { color: var(--up); }
+  .port-sub.down { color: var(--down); }
+  .port-hint { margin-left: auto; padding-left: 28px; font-size: 12px; color: var(--muted); flex-shrink: 0; font-style: italic; }
 
   /* MAIN */
   main { max-width: 1200px; margin: 0 auto; padding: 32px; }
@@ -134,7 +96,8 @@
   .ticker-tag:hover { border-color: #ccc; }
   .ticker-tag .remove {
     width: 16px; height: 16px; border-radius: 50%; background: var(--surface2); border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--muted); transition: background 0.15s; line-height: 1;
+    display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--muted);
+    transition: background 0.15s; line-height: 1;
   }
   .ticker-tag .remove:hover { background: var(--down-bg); color: var(--down); }
   .add-ticker-wrap { display: flex; gap: 6px; }
@@ -146,7 +109,8 @@
   .add-ticker-wrap input:focus { border-color: var(--accent); }
   .btn-add {
     padding: 6px 14px; font-size: 13px; font-weight: 500; border: none; border-radius: 20px;
-    cursor: pointer; background: var(--accent); color: white; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; white-space: nowrap;
+    cursor: pointer; background: var(--accent); color: white; font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.15s; white-space: nowrap;
   }
   .btn-add:hover { opacity: 0.8; }
   .btn-refresh {
@@ -155,7 +119,7 @@
     font-family: 'DM Sans', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
   }
   .btn-refresh:hover { border-color: var(--accent); }
-  .refresh-icon { transition: transform 0.4s; }
+  .refresh-icon { display: inline-block; }
   .btn-refresh.spinning .refresh-icon { animation: spin 0.6s linear; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -175,10 +139,7 @@
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
   .ticker-symbol { font-size: 18px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; }
   .company-name { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
-  .change-badge {
-    padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
-    font-family: 'DM Mono', monospace; white-space: nowrap;
-  }
+  .change-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; font-family: 'DM Mono', monospace; white-space: nowrap; }
   .change-badge.up { background: var(--up-bg); color: var(--up); }
   .change-badge.down { background: var(--down-bg); color: var(--down); }
   .change-badge.neutral { background: var(--surface2); color: var(--neutral); }
@@ -188,43 +149,25 @@
   .price-change-row .up { color: var(--up); }
   .price-change-row .down { color: var(--down); }
 
-  /* SHARES INPUT ROW */
+  /* SHARES INPUT */
   .shares-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px; margin-top: 14px;
+    padding-top: 14px; border-top: 1px solid var(--border);
   }
   .shares-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
   .shares-input {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 4px 8px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface2);
-    width: 80px;
-    outline: none;
-    color: var(--text);
-    transition: border-color 0.15s, background 0.15s;
+    font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; padding: 4px 8px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface2);
+    width: 80px; outline: none; color: var(--text); transition: border-color 0.15s, background 0.15s;
   }
   .shares-input:focus { border-color: var(--accent); background: white; }
   .shares-input::placeholder { color: var(--muted); font-weight: 400; }
 
   /* POSITION P&L */
   .position-pnl {
-    margin-top: 10px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    animation: fadeUp 0.2s ease both;
+    margin-top: 10px; padding: 10px 12px; border-radius: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'DM Mono', monospace; font-size: 12px; animation: fadeUp 0.2s ease both;
   }
   .position-pnl.up { background: var(--up-bg); }
   .position-pnl.down { background: var(--down-bg); }
@@ -273,7 +216,6 @@
   }
   .close-detail:hover { background: var(--surface2); }
   .detail-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; padding-top: 20px; border-top: 1px solid var(--border); }
-  .stat-box { }
   .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
   .stat-value { font-size: 16px; font-weight: 500; font-family: 'DM Mono', monospace; }
 
@@ -290,6 +232,8 @@
 
   @media (max-width: 600px) {
     header, main, .portfolio-banner { padding-left: 16px; padding-right: 16px; }
+    .api-banner { padding-left: 16px; padding-right: 16px; }
+    .api-key-input-wrap { margin-left: 0; }
     .detail-price { font-size: 28px; }
     .stock-grid { grid-template-columns: 1fr; }
     .port-stat { padding: 0 16px; }
@@ -299,7 +243,7 @@
 <body>
 
 <header>
-  <div class="logo"><span class="logo-dot"></span>Pulse</div>
+  <div class="logo"><span class="logo-dot"></span>Okay Stocks</div>
   <div class="header-right">
     <div class="market-status">
       <span class="status-dot" id="mktDot"></span>
@@ -309,12 +253,24 @@
   </div>
 </header>
 
+<!-- API KEY BANNER -->
+<div class="api-banner" id="apiBanner">
+  ⚠️ No API key set. Get a free key at
+  <a href="https://twelvedata.com/apikey" target="_blank">twelvedata.com</a>
+  (no credit card needed) — then paste it here:
+  <div class="api-key-input-wrap">
+    <input type="text" id="apiKeyInput" placeholder="Paste your Twelve Data key" />
+    <button class="btn-sm" onclick="saveApiKey()">Save & Load</button>
+    <button class="btn-sm-outline" id="changeKeyBtn" onclick="showChangeBanner()" style="display:none">Change Key</button>
+  </div>
+</div>
+
 <!-- PORTFOLIO SUMMARY -->
 <div class="portfolio-banner hidden" id="portfolioBanner">
   <div class="port-stat">
     <div class="port-label">Portfolio Value</div>
     <div class="port-value" id="portTotal">—</div>
-    <div class="port-sub" id="portShares">— shares tracked</div>
+    <div class="port-sub" id="portShares">—</div>
   </div>
   <div class="port-stat">
     <div class="port-label">Today's Gain / Loss</div>
@@ -332,15 +288,6 @@
     <div class="port-sub" id="portWorstSub">—</div>
   </div>
   <div class="port-hint">Enter share counts on cards below</div>
-</div>
-
-<div class="api-banner" id="apiBanner" style="display:none">
-  ⚠️ Using demo API key — data may be limited.
-  Get a free key at <a href="https://www.alphavantage.co/support/#api-key" target="_blank">alphavantage.co</a>.
-  <div class="api-key-input-wrap">
-    <input type="text" id="apiKeyInput" placeholder="Paste your key here" />
-    <button class="btn-sm" onclick="saveApiKey()">Save & Refresh</button>
-  </div>
 </div>
 
 <main>
@@ -371,21 +318,27 @@
     <div class="detail-stats" id="dStats"></div>
   </div>
 
-  <div class="stock-grid" id="stockGrid"></div>
+  <div class="stock-grid" id="stockGrid">
+    <div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">🔑</div>
+      <div class="empty-title">Enter your Twelve Data API key to get started</div>
+      <div class="empty-sub">Free at <a href="https://twelvedata.com/apikey" target="_blank" style="color:var(--muted)">twelvedata.com</a> — no credit card needed</div>
+    </div>
+  </div>
 </main>
 
 <footer>
-  Market data provided by <a href="https://alpaca.markets" target="_blank">Alpaca</a>.
-  Real-time US market data. Not financial advice.
+  Market data provided by <a href="https://twelvedata.com" target="_blank">Twelve Data</a>.
+  Data may be delayed. Not financial advice.
 </footer>
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const STORAGE_KEY_TICKERS = 'pulse_tickers';
+const STORAGE_KEY_APIKEY  = 'pulse_apikey';
 const STORAGE_KEY_SHARES  = 'pulse_shares';
-const ALPACA_KEY_ID     = 'PKJZM5UYMJYFSLQVKNLTNY6X5X';
-const ALPACA_SECRET_KEY = 'CNf6QMkz8EZQkJ23bxcPWePUF5vB29S8GeMu3KmRXvDF';
-const ALPACA_DATA_URL   = 'https://data.alpaca.markets/v2';
+
+let apiKey    = localStorage.getItem(STORAGE_KEY_APIKEY) || '';
 let watchlist = JSON.parse(localStorage.getItem(STORAGE_KEY_TICKERS) || '["IBM","AAPL","MSFT","GOOGL"]');
 let shares    = JSON.parse(localStorage.getItem(STORAGE_KEY_SHARES)  || '{}');
 let stockData = {};
@@ -393,11 +346,62 @@ let selectedTicker = null;
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 function init() {
-  document.getElementById('apiBanner').style.display = 'none';
-  renderTags();
   setMarketStatus();
-  loadAll();
+  renderTags();
   document.getElementById('addTickerInput').addEventListener('keydown', e => { if (e.key === 'Enter') addTicker(); });
+
+  if (apiKey) {
+    hideBanner();
+    loadAll();
+  } else {
+    showBanner();
+  }
+}
+
+// ─── API KEY BANNER ───────────────────────────────────────────────────────────
+function showBanner() {
+  const banner = document.getElementById('apiBanner');
+  banner.style.display = 'flex';
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('changeKeyBtn').style.display = 'none';
+}
+
+function hideBanner() {
+  const banner = document.getElementById('apiBanner');
+  // Show a compact "key saved" version instead of full banner
+  banner.innerHTML = `
+    ✅ Twelve Data key active.
+    <button class="btn-sm-outline" style="margin-left:8px" onclick="showChangeBanner()">Change Key</button>
+  `;
+  banner.style.background = '#f0faf4';
+  banner.style.borderBottomColor = '#c0e0cc';
+  banner.style.color = '#2a6040';
+}
+
+function showChangeBanner() {
+  const banner = document.getElementById('apiBanner');
+  banner.style.display = 'flex';
+  banner.style.background = '#fffbf0';
+  banner.style.borderBottomColor = '#f0e0a0';
+  banner.style.color = '#7a6020';
+  banner.innerHTML = `
+    🔑 Enter a new Twelve Data API key:
+    <div class="api-key-input-wrap">
+      <input type="text" id="apiKeyInput" placeholder="Paste your key here" style="font-family:'DM Mono',monospace;font-size:12px;padding:5px 10px;border:1px solid #e0d0a0;border-radius:6px;background:white;width:220px;outline:none;color:var(--text)" />
+      <button class="btn-sm" onclick="saveApiKey()">Save & Reload</button>
+      <button class="btn-sm-outline" onclick="hideBanner()">Cancel</button>
+    </div>
+  `;
+}
+
+function saveApiKey() {
+  const input = document.getElementById('apiKeyInput');
+  const val = input ? input.value.trim() : '';
+  if (!val) return;
+  apiKey = val;
+  localStorage.setItem(STORAGE_KEY_APIKEY, apiKey);
+  hideBanner();
+  loadAll();
 }
 
 // ─── MARKET STATUS ────────────────────────────────────────────────────────────
@@ -423,6 +427,7 @@ function addTicker() {
   const input = document.getElementById('addTickerInput');
   const t = input.value.trim().toUpperCase().replace(/[^A-Z]/g, '');
   if (!t || watchlist.includes(t)) { input.value = ''; return; }
+  if (!apiKey) { showBanner(); return; }
   watchlist.push(t);
   saveWatchlist();
   input.value = '';
@@ -442,24 +447,15 @@ function removeTicker(t) {
   updatePortfolio();
 }
 
-// saveApiKey removed — keys are baked in for Alpaca
-
 // ─── SHARES ───────────────────────────────────────────────────────────────────
 function setShares(ticker, val) {
   const n = parseFloat(val);
-  if (!isNaN(n) && n > 0) {
-    shares[ticker] = n;
-  } else {
-    delete shares[ticker];
-  }
+  if (!isNaN(n) && n > 0) shares[ticker] = n;
+  else delete shares[ticker];
   saveShares();
   updatePortfolio();
-  // Re-render just the P&L block of the card without full grid re-render
   const pnlEl = document.getElementById(`pnl-${ticker}`);
-  if (pnlEl) {
-    const d = stockData[ticker];
-    pnlEl.outerHTML = buildPnlBlock(ticker, d);
-  }
+  if (pnlEl) pnlEl.outerHTML = buildPnlBlock(ticker, stockData[ticker]);
 }
 
 function buildPnlBlock(ticker, d) {
@@ -480,30 +476,25 @@ function buildPnlBlock(ticker, d) {
         <div class="pnl-label">Per share</div>
         <div class="pnl-value" style="font-size:13px">${sign}$${fmt(Math.abs(d.change))}</div>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 // ─── PORTFOLIO SUMMARY ────────────────────────────────────────────────────────
 function updatePortfolio() {
   const banner = document.getElementById('portfolioBanner');
-  const trackedTickers = Object.keys(shares).filter(t => stockData[t] && !stockData[t].error && !stockData[t].loading);
-
-  if (trackedTickers.length === 0) { banner.classList.add('hidden'); return; }
+  const tracked = Object.keys(shares).filter(t => stockData[t] && !stockData[t].error && !stockData[t].loading);
+  if (tracked.length === 0) { banner.classList.add('hidden'); return; }
   banner.classList.remove('hidden');
 
   let totalValue = 0, totalDayPnl = 0, totalPrevValue = 0, totalShares = 0;
-  let bestTicker = null, bestPct = -Infinity;
-  let worstTicker = null, worstPct = Infinity;
+  let bestTicker = null, bestPct = -Infinity, worstTicker = null, worstPct = Infinity;
 
-  trackedTickers.forEach(t => {
-    const d = stockData[t];
-    const qty = shares[t];
+  tracked.forEach(t => {
+    const d = stockData[t], qty = shares[t];
     totalShares += qty;
     totalValue += d.price * qty;
     totalDayPnl += d.change * qty;
     totalPrevValue += d.prevClose * qty;
-
     if (d.changePct > bestPct)  { bestPct = d.changePct;  bestTicker = t; }
     if (d.changePct < worstPct) { worstPct = d.changePct; worstTicker = t; }
   });
@@ -513,8 +504,7 @@ function updatePortfolio() {
   const daySign = totalDayPnl >= 0 ? '+' : '';
 
   document.getElementById('portTotal').textContent = `$${fmt(totalValue)}`;
-  document.getElementById('portTotal').className = 'port-value';
-  document.getElementById('portShares').textContent = `${fmt(totalShares, totalShares % 1 === 0 ? 0 : 2)} shares across ${trackedTickers.length} position${trackedTickers.length !== 1 ? 's' : ''}`;
+  document.getElementById('portShares').textContent = `${fmt(totalShares, totalShares % 1 === 0 ? 0 : 2)} shares · ${tracked.length} position${tracked.length !== 1 ? 's' : ''}`;
 
   document.getElementById('portDayPnl').textContent = `${daySign}$${fmt(Math.abs(totalDayPnl))}`;
   document.getElementById('portDayPnl').className = `port-value ${dayDir}`;
@@ -522,17 +512,14 @@ function updatePortfolio() {
   document.getElementById('portDayPct').className = `port-sub ${dayDir}`;
 
   if (bestTicker) {
-    const bd = stockData[bestTicker];
-    const bSign = bestPct >= 0 ? '+' : '';
+    const bd = stockData[bestTicker], bSign = bestPct >= 0 ? '+' : '';
     document.getElementById('portBest').textContent = bestTicker;
     document.getElementById('portBest').className = 'port-value up';
     document.getElementById('portBestSub').textContent = `${bSign}${fmt(bestPct)}% · ${bSign}$${fmt(Math.abs(bd.change * shares[bestTicker]))}`;
     document.getElementById('portBestSub').className = 'port-sub up';
   }
-
   if (worstTicker) {
-    const wd = stockData[worstTicker];
-    const wSign = worstPct >= 0 ? '+' : '';
+    const wd = stockData[worstTicker], wSign = worstPct >= 0 ? '+' : '';
     document.getElementById('portWorst').textContent = worstTicker;
     document.getElementById('portWorst').className = 'port-value down';
     document.getElementById('portWorstSub').textContent = `${wSign}${fmt(worstPct)}% · ${wSign}$${fmt(Math.abs(wd.change * shares[worstTicker]))}`;
@@ -540,49 +527,32 @@ function updatePortfolio() {
   }
 }
 
-// ─── DATA FETCHING (Finnhub) ──────────────────────────────────────────────────
-const profileCache = {};
-
-// ─── DATA FETCHING (Alpaca) ───────────────────────────────────────────────────
-const profileCache = {};
-
-const ALPACA_HEADERS = {
-  'APCA-API-KEY-ID':     ALPACA_KEY_ID,
-  'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
-};
-
+// ─── DATA FETCHING (Twelve Data) ─────────────────────────────────────────────
 async function fetchQuote(ticker) {
+  const url = `https://api.twelvedata.com/quote?symbol=${ticker}&apikey=${apiKey}`;
   try {
-    // Alpaca: latest bar (OHLCV) + latest trade (real-time price) + previous close snapshot
-    const [snapRes] = await Promise.all([
-      fetch(`${ALPACA_DATA_URL}/stocks/${ticker}/snapshot`, { headers: ALPACA_HEADERS }),
-    ]);
+    const res = await fetch(url);
+    const q = await res.json();
 
-    if (snapRes.status === 422 || snapRes.status === 404) throw new Error('no_data');
-    if (snapRes.status === 429) throw new Error('rate_limit');
-    if (!snapRes.ok) throw new Error('no_data');
+    if (q.status === 'error') {
+      if (q.code === 429) throw new Error('rate_limit');
+      throw new Error('no_data');
+    }
 
-    const snap = await snapRes.json();
+    const price = parseFloat(q.close);   // "close" = latest/current price in Twelve Data's quote
+    const open  = parseFloat(q.open);
 
-    // Alpaca snapshot shape: { latestTrade, latestQuote, minuteBar, dailyBar, prevDailyBar }
-    const price     = snap.latestTrade?.p ?? snap.dailyBar?.c;
-    const prevClose = snap.prevDailyBar?.c;
-    const open      = snap.dailyBar?.o;
-    const high      = snap.dailyBar?.h;
-    const low       = snap.dailyBar?.l;
-    const volume    = snap.dailyBar?.v;
-    const barDate   = snap.dailyBar?.t ? snap.dailyBar.t.slice(0, 10) : null;
+    if (isNaN(price) || isNaN(open)) throw new Error('no_data');
 
-    if (!price) throw new Error('no_data');
+    const change    = price - open;
+    const changePct = open > 0 ? (change / open) * 100 : 0;
 
-    const change    = prevClose ? price - prevClose : 0;
-    const changePct = prevClose ? (change / prevClose) * 100 : 0;
-
-    return { ticker, price, open, high, low, prevClose, change, changePct, volume, latestDay: barDate };
+    return { ticker, price, open, change, changePct, latestDay: q.datetime };
   } catch (e) { return { ticker, error: e.message }; }
 }
 
 async function loadAll() {
+  if (!apiKey) return;
   renderSkeletons();
   const results = await Promise.all(watchlist.map(t => fetchQuote(t)));
   results.forEach(d => { stockData[d.ticker] = d; });
@@ -601,6 +571,7 @@ async function loadSingle(ticker) {
 }
 
 async function refreshAll() {
+  if (!apiKey) { showBanner(); return; }
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
   await loadAll();
@@ -618,8 +589,7 @@ function renderSkeletons() {
     <div class="skeleton-card">
       <div class="skel skel-title"></div><div class="skel skel-sub"></div>
       <div class="skel skel-price"></div><div class="skel skel-change" style="margin-top:8px"></div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function fmt(n, decimals = 2) {
@@ -636,8 +606,7 @@ function fmtVol(n) {
 }
 
 function sparklineSVG(open, high, low, close, changePct) {
-  const isUp = changePct >= 0;
-  const color = isUp ? '#1a7a4a' : '#c0392b';
+  const isUp = changePct >= 0, color = isUp ? '#1a7a4a' : '#c0392b';
   const seed = Math.abs(open + high + low + close) % 1;
   const N = 20, pts = [];
   for (let i = 0; i < N; i++) {
@@ -645,8 +614,7 @@ function sparklineSVG(open, high, low, close, changePct) {
     pts.push({ x: t, y: t * changePct / 100 + Math.sin(t * Math.PI * 3 + seed * 10) * 0.15 });
   }
   const minY = Math.min(...pts.map(p=>p.y)), maxY = Math.max(...pts.map(p=>p.y));
-  const range = maxY - minY || 0.01;
-  const W = 220, H = 40;
+  const range = maxY - minY || 0.01, W = 220, H = 40;
   const coords = pts.map(p => ({ x: p.x*W, y: H - ((p.y-minY)/range)*(H-8) - 4 }));
   const d = coords.map((p,i) => `${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
@@ -662,9 +630,7 @@ const COMPANY_NAMES = {
   AMD:'Advanced Micro Devices',INTC:'Intel Corp.',CRM:'Salesforce',ORCL:'Oracle Corp.',
   BABA:'Alibaba Group',JPM:'JPMorgan Chase',GS:'Goldman Sachs',V:'Visa Inc.',
 };
-function companyName(t) {
-  return profileCache[t] || COMPANY_NAMES[t] || t;
-}
+function companyName(t) { return COMPANY_NAMES[t] || t; }
 
 function renderGrid() {
   const grid = document.getElementById('stockGrid');
@@ -688,14 +654,14 @@ function renderGrid() {
       </div>`;
 
     if (d.error) {
-      const msg = d.error === 'rate_limit' ? 'API rate limit reached. Wait a moment and refresh.' : 'Could not load data — check the ticker symbol.';
+      const msg = d.error === 'rate_limit'
+        ? 'Rate limit reached (800 req/day on free tier). Wait a moment or check your key.'
+        : 'Could not load data — check the ticker symbol.';
       return `<div class="error-card" style="animation-delay:${delay}"><strong>${ticker}</strong><span>${msg}</span></div>`;
     }
 
-    const pct = d.changePct;
-    const dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
-    const sign = pct >= 0 ? '+' : '';
-    const selected = selectedTicker === ticker ? 'selected' : '';
+    const pct = d.changePct, dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
+    const sign = pct >= 0 ? '+' : '', selected = selectedTicker === ticker ? 'selected' : '';
     const sharesVal = shares[ticker] || '';
 
     return `
@@ -709,27 +675,19 @@ function renderGrid() {
         </div>
         <div class="price-main">$${fmt(d.price)}</div>
         <div class="price-change-row">
-          <span class="${dir}">${sign}$${fmt(Math.abs(d.change))}</span>
-          &nbsp;·&nbsp; Vol: ${fmtVol(d.volume)}
+          <span class="${dir}">${sign}$${fmt(Math.abs(d.change))} from open</span>
         </div>
-        <div class="sparkline-wrap">${sparklineSVG(d.open, d.high, d.low, d.price, pct)}</div>
         <div class="shares-row" onclick="event.stopPropagation()">
           <span class="shares-label">Shares owned</span>
-          <input
-            class="shares-input"
-            type="number"
-            min="0"
-            step="any"
-            placeholder="optional"
+          <input class="shares-input" type="number" min="0" step="any" placeholder="optional"
             value="${sharesVal}"
             oninput="setShares('${ticker}', this.value)"
-            onclick="event.stopPropagation()"
-          />
+            onclick="event.stopPropagation()" />
         </div>
         ${buildPnlBlock(ticker, d)}
         <div class="card-meta">
           <div class="meta-item"><div class="meta-label">Open</div><div class="meta-value">$${fmt(d.open)}</div></div>
-          <div class="meta-item"><div class="meta-label">Prev Close</div><div class="meta-value">$${fmt(d.prevClose)}</div></div>
+          <div class="meta-item"><div class="meta-label">Current</div><div class="meta-value">$${fmt(d.price)}</div></div>
         </div>
       </div>`;
   }).join('');
@@ -746,36 +704,33 @@ function selectCard(ticker) {
 function showDetail(ticker) {
   const d = stockData[ticker];
   if (!d || d.error || d.loading) return;
-  const panel = document.getElementById('detailPanel');
   const pct = d.changePct, sign = pct >= 0 ? '+' : '', dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
 
   document.getElementById('dTicker').textContent = ticker;
   document.getElementById('dName').textContent = companyName(ticker);
   document.getElementById('dPrice').textContent = `$${fmt(d.price)}`;
-
   const changeEl = document.getElementById('dChange');
   changeEl.textContent = `${sign}$${fmt(d.change)} (${sign}${fmt(pct)}%)`;
   changeEl.className = `detail-change ${dir}`;
 
   const qty = shares[ticker];
   const extraStats = qty ? [
-    { label: 'Your Shares', value: fmt(qty, qty % 1 === 0 ? 0 : 4) },
+    { label: 'Your Shares',   value: fmt(qty, qty % 1 === 0 ? 0 : 4) },
     { label: 'Holding Value', value: `$${fmt(d.price * qty)}` },
-    { label: "Today's P&L", value: `${sign}$${fmt(d.change * qty)}` },
+    { label: "Today's P&L",  value: `${sign}$${fmt(d.change * qty)}` },
   ] : [];
 
   document.getElementById('dStats').innerHTML = [
-    { label: 'Open', value: `$${fmt(d.open)}` },
-    { label: 'Day High', value: `$${fmt(d.high)}` },
-    { label: 'Day Low', value: `$${fmt(d.low)}` },
-    { label: 'Prev Close', value: `$${fmt(d.prevClose)}` },
-    { label: 'Volume', value: fmtVol(d.volume) },
-    { label: 'Latest Day', value: d.latestDay || '—' },
+    { label: 'Open',           value: `$${fmt(d.open)}` },
+    { label: 'Current Price',  value: `$${fmt(d.price)}` },
+    { label: 'Change from Open', value: `${sign}$${fmt(d.change)}` },
+    { label: '% Change',       value: `${sign}${fmt(pct)}%` },
+    { label: 'As of',          value: d.latestDay || '—' },
     ...extraStats,
   ].map(s => `<div class="stat-box"><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div></div>`).join('');
 
-  panel.classList.add('visible');
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('detailPanel').classList.add('visible');
+  document.getElementById('detailPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function closeDetail() {
