@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Okay Stocks — Stock Dashboard</title>
+<title>Pulse — Stock Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -124,36 +124,43 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* STOCK GRID */
-  .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 40px; }
 
   .stock-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 22px; box-shadow: var(--shadow); cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; box-shadow: var(--shadow); cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
     animation: fadeUp 0.3s ease both;
   }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-  .stock-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-color: #d0cec6; }
-  .stock-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,25,22,0.06), var(--shadow); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .stock-card:active { opacity: 0.85; }
+  .stock-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,25,22,0.06); }
 
-  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-  .ticker-symbol { font-size: 18px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; }
-  .company-name { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
-  .change-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; font-family: 'DM Mono', monospace; white-space: nowrap; }
+  .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .ticker-symbol { font-size: 15px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.3px; }
+  .company-name { font-size: 11px; color: var(--muted); margin-top: 1px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+  .change-badge { padding: 3px 7px; border-radius: 20px; font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace; white-space: nowrap; }
   .change-badge.up { background: var(--up-bg); color: var(--up); }
   .change-badge.down { background: var(--down-bg); color: var(--down); }
   .change-badge.neutral { background: var(--surface2); color: var(--neutral); }
 
-  .price-main { font-size: 28px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -1px; margin-bottom: 4px; }
-  .price-change-row { font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .price-main { font-size: 20px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; margin-bottom: 2px; }
+  .price-change-row { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
   .price-change-row .up { color: var(--up); }
   .price-change-row .down { color: var(--down); }
 
-  /* SHARES INPUT */
-  .shares-row {
-    display: flex; align-items: center; gap: 8px; margin-top: 14px;
-    padding-top: 14px; border-top: 1px solid var(--border);
+  /* EXPANDED SECTION (visible only when card is selected) */
+  .card-expanded {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.2s ease both;
   }
+  .stock-card.selected .card-expanded { display: block; }
+
+  /* SHARES INPUT */
+  .shares-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
   .shares-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
   .shares-input {
     font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; padding: 4px 8px;
@@ -165,27 +172,23 @@
 
   /* POSITION P&L */
   .position-pnl {
-    margin-top: 10px; padding: 10px 12px; border-radius: 10px;
+    padding: 8px 10px; border-radius: 8px;
     display: flex; justify-content: space-between; align-items: center;
-    font-family: 'DM Mono', monospace; font-size: 12px; animation: fadeUp 0.2s ease both;
+    font-family: 'DM Mono', monospace; font-size: 12px;
   }
   .position-pnl.up { background: var(--up-bg); }
   .position-pnl.down { background: var(--down-bg); }
-  .position-pnl .pnl-label { color: var(--muted); font-size: 11px; }
-  .position-pnl .pnl-value { font-size: 14px; font-weight: 600; }
+  .position-pnl .pnl-label { color: var(--muted); font-size: 10px; }
+  .position-pnl .pnl-value { font-size: 13px; font-weight: 600; }
   .position-pnl.up .pnl-value { color: var(--up); }
   .position-pnl.down .pnl-value { color: var(--down); }
-  .position-pnl .pnl-holding { font-size: 11px; color: var(--muted); margin-top: 1px; }
-
-  /* SPARKLINE */
-  .sparkline-wrap { margin-top: 14px; height: 40px; overflow: hidden; }
-  .sparkline-wrap svg { width: 100%; height: 100%; }
+  .position-pnl .pnl-holding { font-size: 10px; color: var(--muted); margin-top: 1px; }
 
   /* CARD META */
-  .card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
-  .meta-item { font-size: 11px; }
-  .meta-label { color: var(--muted); margin-bottom: 2px; }
-  .meta-value { font-weight: 500; font-family: 'DM Mono', monospace; font-size: 12px; }
+  .card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+  .meta-item { font-size: 10px; }
+  .meta-label { color: var(--muted); margin-bottom: 1px; }
+  .meta-value { font-weight: 500; font-family: 'DM Mono', monospace; font-size: 11px; }
 
   /* SKELETON */
   .skeleton-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; animation: fadeUp 0.3s ease both; }
@@ -196,35 +199,12 @@
   .skel-price { height: 32px; width: 120px; margin-bottom: 6px; }
   .skel-change { height: 12px; width: 80px; }
 
-  /* DETAIL PANEL */
-  .detail-panel {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 28px; box-shadow: var(--shadow); margin-bottom: 40px; display: none;
-    animation: fadeUp 0.25s ease both; position: relative;
-  }
-  .detail-panel.visible { display: block; }
-  .detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-  .detail-ticker { font-size: 28px; font-weight: 600; font-family: 'DM Mono', monospace; }
-  .detail-name { font-size: 15px; color: var(--muted); margin-top: 2px; }
-  .detail-price-block { text-align: right; }
-  .detail-price { font-size: 36px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -1.5px; }
-  .detail-change { font-size: 14px; font-family: 'DM Mono', monospace; margin-top: 4px; }
-  .close-detail {
-    position: absolute; top: 20px; right: 20px; background: none; border: 1px solid var(--border);
-    border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 14px; color: var(--muted);
-    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
-  }
-  .close-detail:hover { background: var(--surface2); }
-  .detail-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; padding-top: 20px; border-top: 1px solid var(--border); }
-  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-  .stat-value { font-size: 16px; font-weight: 500; font-family: 'DM Mono', monospace; }
-
   /* ERROR / EMPTY */
-  .error-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; color: var(--muted); font-size: 13px; display: flex; flex-direction: column; gap: 6px; }
+  .error-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; color: var(--muted); font-size: 12px; display: flex; flex-direction: column; gap: 4px; }
   .error-card strong { color: var(--down); font-family: 'DM Mono', monospace; }
-  .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
-  .empty-icon { font-size: 40px; margin-bottom: 12px; }
-  .empty-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-icon { font-size: 36px; margin-bottom: 12px; }
+  .empty-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
   .empty-sub { font-size: 13px; }
 
   footer { text-align: center; padding: 24px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); }
@@ -234,8 +214,7 @@
     header, main, .portfolio-banner { padding-left: 16px; padding-right: 16px; }
     .api-banner { padding-left: 16px; padding-right: 16px; }
     .api-key-input-wrap { margin-left: 0; }
-    .detail-price { font-size: 28px; }
-    .stock-grid { grid-template-columns: 1fr; }
+    .stock-grid { grid-template-columns: 1fr 1fr; }
     .port-stat { padding: 0 16px; }
   }
 </style>
@@ -243,7 +222,7 @@
 <body>
 
 <header>
-  <div class="logo"><span class="logo-dot"></span>Okay Stocks</div>
+  <div class="logo"><span class="logo-dot"></span>Pulse</div>
   <div class="header-right">
     <div class="market-status">
       <span class="status-dot" id="mktDot"></span>
@@ -303,28 +282,7 @@
     </div>
   </div>
 
-  <div class="detail-panel" id="detailPanel">
-    <button class="close-detail" onclick="closeDetail()">✕</button>
-    <div class="detail-header">
-      <div>
-        <div class="detail-ticker" id="dTicker">—</div>
-        <div class="detail-name" id="dName">—</div>
-      </div>
-      <div class="detail-price-block">
-        <div class="detail-price" id="dPrice">—</div>
-        <div class="detail-change" id="dChange">—</div>
-      </div>
-    </div>
-    <div class="detail-stats" id="dStats"></div>
-  </div>
-
   <div class="stock-grid" id="stockGrid">
-    <div class="empty-state" style="grid-column:1/-1">
-      <div class="empty-icon">🔑</div>
-      <div class="empty-title">Enter your Twelve Data API key to get started</div>
-      <div class="empty-sub">Free at <a href="https://twelvedata.com/apikey" target="_blank" style="color:var(--muted)">twelvedata.com</a> — no credit card needed</div>
-    </div>
-  </div>
 </main>
 
 <footer>
@@ -643,6 +601,15 @@ function renderGrid() {
     return;
   }
 
+  if (!apiKey) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">🔑</div>
+      <div class="empty-title">Enter your Twelve Data API key to get started</div>
+      <div class="empty-sub">Free at <a href="https://twelvedata.com/apikey" target="_blank" style="color:var(--muted)">twelvedata.com</a> — no credit card needed</div>
+    </div>`;
+    return;
+  }
+
   grid.innerHTML = watchlist.map((ticker, i) => {
     const d = stockData[ticker];
     const delay = `${i * 0.04}s`;
@@ -677,65 +644,32 @@ function renderGrid() {
         <div class="price-change-row">
           <span class="${dir}">${sign}$${fmt(Math.abs(d.change))} from open</span>
         </div>
-        <div class="shares-row" onclick="event.stopPropagation()">
-          <span class="shares-label">Shares owned</span>
-          <input class="shares-input" type="number" min="0" step="any" placeholder="optional"
-            value="${sharesVal}"
-            oninput="setShares('${ticker}', this.value)"
-            onclick="event.stopPropagation()" />
-        </div>
-        ${buildPnlBlock(ticker, d)}
-        <div class="card-meta">
-          <div class="meta-item"><div class="meta-label">Open</div><div class="meta-value">$${fmt(d.open)}</div></div>
-          <div class="meta-item"><div class="meta-label">Current</div><div class="meta-value">$${fmt(d.price)}</div></div>
+        <div class="card-expanded">
+          <div class="shares-row" onclick="event.stopPropagation()">
+            <span class="shares-label">Shares owned</span>
+            <input class="shares-input" type="number" min="0" step="any" placeholder="optional"
+              value="${sharesVal}"
+              oninput="setShares('${ticker}', this.value)"
+              onclick="event.stopPropagation()" />
+          </div>
+          ${buildPnlBlock(ticker, d)}
+          <div class="card-meta">
+            <div class="meta-item"><div class="meta-label">Open</div><div class="meta-value">$${fmt(d.open)}</div></div>
+            <div class="meta-item"><div class="meta-label">Current</div><div class="meta-value">$${fmt(d.price)}</div></div>
+          </div>
         </div>
       </div>`;
   }).join('');
 }
 
-// ─── DETAIL PANEL ─────────────────────────────────────────────────────────────
+// ─── CARD EXPAND/COLLAPSE ─────────────────────────────────────────────────────
 function selectCard(ticker) {
-  if (selectedTicker === ticker) { closeDetail(); return; }
-  selectedTicker = ticker;
+  selectedTicker = selectedTicker === ticker ? null : ticker;
   renderGrid();
-  showDetail(ticker);
-}
-
-function showDetail(ticker) {
-  const d = stockData[ticker];
-  if (!d || d.error || d.loading) return;
-  const pct = d.changePct, sign = pct >= 0 ? '+' : '', dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
-
-  document.getElementById('dTicker').textContent = ticker;
-  document.getElementById('dName').textContent = companyName(ticker);
-  document.getElementById('dPrice').textContent = `$${fmt(d.price)}`;
-  const changeEl = document.getElementById('dChange');
-  changeEl.textContent = `${sign}$${fmt(d.change)} (${sign}${fmt(pct)}%)`;
-  changeEl.className = `detail-change ${dir}`;
-
-  const qty = shares[ticker];
-  const extraStats = qty ? [
-    { label: 'Your Shares',   value: fmt(qty, qty % 1 === 0 ? 0 : 4) },
-    { label: 'Holding Value', value: `$${fmt(d.price * qty)}` },
-    { label: "Today's P&L",  value: `${sign}$${fmt(d.change * qty)}` },
-  ] : [];
-
-  document.getElementById('dStats').innerHTML = [
-    { label: 'Open',           value: `$${fmt(d.open)}` },
-    { label: 'Current Price',  value: `$${fmt(d.price)}` },
-    { label: 'Change from Open', value: `${sign}$${fmt(d.change)}` },
-    { label: '% Change',       value: `${sign}${fmt(pct)}%` },
-    { label: 'As of',          value: d.latestDay || '—' },
-    ...extraStats,
-  ].map(s => `<div class="stat-box"><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div></div>`).join('');
-
-  document.getElementById('detailPanel').classList.add('visible');
-  document.getElementById('detailPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function closeDetail() {
   selectedTicker = null;
-  document.getElementById('detailPanel').classList.remove('visible');
   renderGrid();
 }
 
