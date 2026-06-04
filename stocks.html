@@ -90,8 +90,14 @@
   /* MAIN */
   main { max-width: 1200px; margin: 0 auto; padding: 32px; }
 
-  /* WATCHLIST BAR */
-  .watchlist-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+  /* WATCHLIST BAR (bottom) */
+  .watchlist-bar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    max-width: 1200px; margin: 0 auto;
+    padding: 16px 32px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
   .watchlist-label { font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
   .ticker-tags { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
   .ticker-tag {
@@ -157,6 +163,11 @@
   .change-badge.neutral { background: var(--surface2); color: var(--neutral); }
   /* hide the old price-change-row on collapsed cards */
   .price-change-row { display: none; }
+
+  /* inline P&L shown next to price on collapsed card */
+  .inline-pnl { font-size: 11px; font-family: 'DM Mono', monospace; opacity: 0.85; }
+  .inline-pnl.up { color: var(--up); }
+  .inline-pnl.down { color: var(--down); }
 
   /* EXPANDED SECTION (visible only when card is selected) */
   .card-expanded {
@@ -260,24 +271,23 @@
     <div class="port-value" id="portWorst">—</div>
     <div class="port-sub" id="portWorstSub">—</div>
   </div>
-  <div class="port-hint">Enter share counts on cards below</div>
 </div>
 
 <main>
-  <div class="watchlist-bar">
-    <span class="watchlist-label">Watchlist</span>
-    <div class="ticker-tags" id="tickerTags"></div>
-    <div class="add-ticker-wrap">
-      <input type="text" id="addTickerInput" placeholder="AAPL" maxlength="6" />
-      <button class="btn-add" onclick="addTicker()">+ Add</button>
-      <button class="btn-refresh" id="refreshBtn" onclick="refreshAll()">
-        <span class="refresh-icon">↻</span> Refresh
-      </button>
-    </div>
-  </div>
-
   <div class="stock-grid" id="stockGrid">
 </main>
+
+<div class="watchlist-bar">
+  <span class="watchlist-label">Watchlist</span>
+  <div class="ticker-tags" id="tickerTags"></div>
+  <div class="add-ticker-wrap">
+    <input type="text" id="addTickerInput" placeholder="AAPL" maxlength="6" />
+    <button class="btn-add" onclick="addTicker()">+ Add</button>
+    <button class="btn-refresh" id="refreshBtn" onclick="refreshAll()">
+      <span class="refresh-icon">↻</span> Refresh
+    </button>
+  </div>
+</div>
 
 <footer>
   <div id="apiBanner" class="footer-api-section">
@@ -625,7 +635,16 @@ function renderGrid() {
 
     const pct = d.changePct, dir = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
     const sign = pct >= 0 ? '+' : '', selected = selectedTicker === ticker ? 'selected' : '';
-    const sharesVal = shares[ticker] || '';
+    const sharesVal = qty || '';
+
+    const qty = shares[ticker];
+    const inlinePnl = (() => {
+      if (!qty) return '';
+      const dayPnl = d.change * qty;
+      const pnlSign = dayPnl >= 0 ? '+' : '−';
+      const pnlDir = dayPnl >= 0 ? 'up' : 'down';
+      return `<span class="inline-pnl ${pnlDir}">(${pnlSign}$${fmt(Math.abs(dayPnl))})</span>`;
+    })();
 
     return `
       <div class="stock-card ${selected}" style="animation-delay:${delay}" onclick="selectCard('${ticker}')">
@@ -635,7 +654,7 @@ function renderGrid() {
             <div class="company-name">${companyName(ticker)}</div>
           </div>
           <div class="card-right">
-            <div class="price-main">$${fmt(d.price)}</div>
+            <div class="price-main">$${fmt(d.price)} ${inlinePnl}</div>
             <div class="change-badge ${dir}">${sign}${fmt(pct)}%</div>
           </div>
         </div>
