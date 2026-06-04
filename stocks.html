@@ -382,10 +382,10 @@
 <script>
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const STORAGE_KEY_TICKERS = 'pulse_tickers';
-const STORAGE_KEY_APIKEY  = 'pulse_apikey';
 const STORAGE_KEY_SHARES  = 'pulse_shares';
-
-let apiKey   = localStorage.getItem(STORAGE_KEY_APIKEY) || 'd8gc121r01qlgcuilm5gd8gc121r01qlgcuilm60';
+const ALPACA_KEY_ID     = 'PKJZM5UYMJYFSLQVKNLTNY6X5X';
+const ALPACA_SECRET_KEY = 'CNf6QMkz8EZQkJ23bxcPWePUF5vB29S8GeMu3KmRXvDF';
+const ALPACA_DATA_URL   = 'https://data.alpaca.markets/v2';
 let watchlist = JSON.parse(localStorage.getItem(STORAGE_KEY_TICKERS) || '["IBM","AAPL","MSFT","GOOGL"]');
 let shares    = JSON.parse(localStorage.getItem(STORAGE_KEY_SHARES)  || '{}');
 let stockData = {};
