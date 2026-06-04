@@ -375,18 +375,17 @@
 </main>
 
 <footer>
-  Market data provided by <a href="https://www.alphavantage.co" target="_blank">Alpha Vantage</a>.
-  Data may be delayed up to 15 minutes. Not financial advice.
+  Market data provided by <a href="https://finnhub.io" target="_blank">Finnhub</a>.
+  Real-time US market data. Not financial advice.
 </footer>
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-const DEMO_KEY = 'demo';
 const STORAGE_KEY_TICKERS = 'pulse_tickers';
 const STORAGE_KEY_APIKEY  = 'pulse_apikey';
 const STORAGE_KEY_SHARES  = 'pulse_shares';
 
-let apiKey   = localStorage.getItem(STORAGE_KEY_APIKEY) || 'MBQ1M50QZYTC65WH';
+let apiKey   = localStorage.getItem(STORAGE_KEY_APIKEY) || 'd8gc121r01qlgcuilm5gd8gc121r01qlgcuilm60';
 let watchlist = JSON.parse(localStorage.getItem(STORAGE_KEY_TICKERS) || '["IBM","AAPL","MSFT","GOOGL"]');
 let shares    = JSON.parse(localStorage.getItem(STORAGE_KEY_SHARES)  || '{}');
 let stockData = {};
@@ -394,8 +393,7 @@ let selectedTicker = null;
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 function init() {
-  if (apiKey !== DEMO_KEY) document.getElementById('apiBanner').style.display = 'none';
-  document.getElementById('apiKeyInput').value = apiKey === DEMO_KEY ? '' : apiKey;
+  document.getElementById('apiBanner').style.display = 'none';
   renderTags();
   setMarketStatus();
   loadAll();
@@ -549,26 +547,50 @@ function updatePortfolio() {
   }
 }
 
-// ─── DATA FETCHING ────────────────────────────────────────────────────────────
-async function fetchQuote(ticker) {
-  const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${apiKey}`;
+// ─── DATA FETCHING (Finnhub) ──────────────────────────────────────────────────
+const profileCache = {};
+
+async function fetchProfile(ticker) {
+  if (profileCache[ticker]) return profileCache[ticker];
   try {
-    const res = await fetch(url);
+    const res = await fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`);
     const json = await res.json();
-    if (json['Note'] || json['Information']) throw new Error('rate_limit');
-    const q = json['Global Quote'];
-    if (!q || !q['05. price']) throw new Error('no_data');
+    profileCache[ticker] = json.name || ticker;
+  } catch { profileCache[ticker] = ticker; }
+  return profileCache[ticker];
+}
+
+async function fetchQuote(ticker) {
+  try {
+    const [quoteRes, profileRes] = await Promise.all([
+      fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`),
+      fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${apiKey}`)
+    ]);
+    const q = await quoteRes.json();
+    const p = await profileRes.json();
+
+    // Finnhub returns all zeros for unknown tickers
+    if (!q.c || q.c === 0) throw new Error('no_data');
+
+    const price     = q.c;   // current price
+    const prevClose = q.pc;  // previous close
+    const change    = price - prevClose;
+    const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
+
+    if (p.name) profileCache[ticker] = p.name;
+
     return {
       ticker,
-      price:     parseFloat(q['05. price']),
-      open:      parseFloat(q['02. open']),
-      high:      parseFloat(q['03. high']),
-      low:       parseFloat(q['04. low']),
-      prevClose: parseFloat(q['08. previous close']),
-      change:    parseFloat(q['09. change']),
-      changePct: parseFloat(q['10. change percent']),
-      volume:    parseInt(q['06. volume']),
-      latestDay: q['07. latest trading day'],
+      price,
+      open:      q.o,
+      high:      q.h,
+      low:       q.l,
+      prevClose,
+      change,
+      changePct,
+      volume:    null,   // not in Finnhub /quote; would need separate call
+      latestDay: new Date(q.t * 1000).toISOString().slice(0, 10),
+      companyName: p.name || ticker,
     };
   } catch (e) { return { ticker, error: e.message }; }
 }
@@ -653,7 +675,9 @@ const COMPANY_NAMES = {
   AMD:'Advanced Micro Devices',INTC:'Intel Corp.',CRM:'Salesforce',ORCL:'Oracle Corp.',
   BABA:'Alibaba Group',JPM:'JPMorgan Chase',GS:'Goldman Sachs',V:'Visa Inc.',
 };
-function companyName(t) { return COMPANY_NAMES[t] || t; }
+function companyName(t) {
+  return profileCache[t] || COMPANY_NAMES[t] || t;
+}
 
 function renderGrid() {
   const grid = document.getElementById('stockGrid');
@@ -677,7 +701,7 @@ function renderGrid() {
       </div>`;
 
     if (d.error) {
-      const msg = d.error === 'rate_limit' ? 'API rate limit reached. Wait a minute or check your key.' : 'Could not load data for this ticker.';
+      const msg = d.error === 'rate_limit' ? 'API rate limit reached. Wait a moment and refresh.' : 'Could not load data — check the ticker symbol.';
       return `<div class="error-card" style="animation-delay:${delay}"><strong>${ticker}</strong><span>${msg}</span></div>`;
     }
 
