@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse — Stock Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #e4e2da;
+    --text: #1a1916;
+    --muted: #8a877e;
+    --accent: #1a1916;
+    --up: #1a7a4a;
+    --up-bg: #e8f5ee;
+    --down: #c0392b;
+    --down-bg: #fdf0ee;
+    --neutral: #5a5750;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px;
+    display: flex; align-items: center; justify-content: space-between; height: 56px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 17px; font-weight: 600; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 7px; height: 7px; background: var(--up); border-radius: 50%; animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .market-status { font-size: 12px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .last-updated { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  /* PORTFOLIO SUMMARY */
+  .portfolio-banner {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 16px 20px; display: flex; align-items: stretch; gap: 0; overflow-x: auto;
+  }
+  .portfolio-banner.hidden { display: none; }
+  .port-stat { padding: 0 20px; border-right: 1px solid var(--border); flex-shrink: 0; }
+  .port-stat:first-child { padding-left: 0; }
+  .port-stat:last-child { border-right: none; }
+  .port-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+  .port-value { font-size: 20px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; }
+  .port-value.up { color: var(--up); }
+  .port-value.down { color: var(--down); }
+  .port-sub { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+  .port-sub.up { color: var(--up); }
+  .port-sub.down { color: var(--down); }
+
+  /* MAIN */
+  main { max-width: 680px; margin: 0 auto; padding: 16px 16px 8px; }
+
+  /* STOCK LIST */
+  .stock-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+  .stock-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 16px; box-shadow: var(--shadow); cursor: pointer;
+    transition: border-color 0.15s;
+    animation: fadeUp 0.25s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+  .stock-card:active { opacity: 0.8; }
+  .stock-card.selected { border-color: var(--accent); }
+
+  /* COLLAPSED ROW */
+  .card-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .card-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .ticker-symbol { font-size: 14px; font-weight: 600; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+  .company-name { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .price-main { font-size: 15px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .inline-pnl { font-size: 11px; font-family: 'DM Mono', monospace; }
+  .inline-pnl.up { color: var(--up); }
+  .inline-pnl.down { color: var(--down); }
+  .change-badge { padding: 3px 7px; border-radius: 20px; font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace; white-space: nowrap; }
+  .change-badge.up { background: var(--up-bg); color: var(--up); }
+  .change-badge.down { background: var(--down-bg); color: var(--down); }
+  .change-badge.neutral { background: var(--surface2); color: var(--neutral); }
+
+  /* EXPANDED SECTION */
+  .card-expanded {
+    display: none; margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.15s ease both;
+  }
+  .stock-card.selected .card-expanded { display: block; }
+
+  .exp-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .exp-item .exp-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+  .exp-item .exp-value { font-size: 14px; font-weight: 500; font-family: 'DM Mono', monospace; }
+  .exp-item .exp-value.up { color: var(--up); }
+  .exp-item .exp-value.down { color: var(--down); }
+
+  /* SKELETON */
+  .skeleton-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+  .skel { background: linear-gradient(90deg, var(--surface2) 25%, #e8e6e0 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 5px; display: inline-block; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* ERROR / EMPTY STATES */
+  .state-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 32px 20px; text-align: center; color: var(--muted);
+  }
+  .state-card .icon { font-size: 28px; margin-bottom: 10px; }
+  .state-card .title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .state-card .sub { font-size: 13px; line-height: 1.5; }
+  .state-card a { color: var(--accent); }
+
+  /* BOTTOM BAR */
+  .bottom-bar {
+    max-width: 680px; margin: 0 auto;
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .sheet-url-wrap { display: flex; gap: 6px; flex: 1; min-width: 0; }
+  .sheet-url-input {
+    font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 10px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+    outline: none; color: var(--text); flex: 1; min-width: 0;
+    transition: border-color 0.15s;
+  }
+  .sheet-url-input:focus { border-color: var(--accent); }
+  .btn-load {
+    padding: 6px 14px; font-size: 12px; font-weight: 500; border: none; border-radius: 8px;
+    cursor: pointer; background: var(--accent); color: white; font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.15s; white-space: nowrap; flex-shrink: 0;
+  }
+  .btn-load:hover { opacity: 0.8; }
+  .btn-refresh {
+    padding: 6px 12px; font-size: 12px; font-weight: 500; border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; background: var(--surface); color: var(--text);
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+  }
+  .btn-refresh:hover { border-color: var(--accent); }
+  .refresh-icon { display: inline-block; }
+  .btn-refresh.spinning .refresh-icon { animation: spin 0.6s linear; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 16px; font-size: 11px; color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="logo-dot"></span>Pulse</div>
+  <div class="header-right">
+    <div class="market-status">
+      <span class="status-dot" id="mktDot"></span>
+      <span id="mktStatus">—</span>
+    </div>
+    <div class="last-updated" id="lastUpdated">—</div>
+  </div>
+</header>
+
+<div class="portfolio-banner hidden" id="portfolioBanner">
+  <div class="port-stat">
+    <div class="port-label">Portfolio Value</div>
+    <div class="port-value" id="portTotal">—</div>
+    <div class="port-sub" id="portPositions">—</div>
+  </div>
+  <div class="port-stat">
+    <div class="port-label">Today's Gain / Loss</div>
+    <div class="port-value" id="portDayPnl">—</div>
+    <div class="port-sub" id="portDayPct">—</div>
+  </div>
+  <div class="port-stat">
+    <div class="port-label">Best Today</div>
+    <div class="port-value" id="portBest">—</div>
+    <div class="port-sub" id="portBestSub">—</div>
+  </div>
+  <div class="port-stat">
+    <div class="port-label">Worst Today</div>
+    <div class="port-value" id="portWorst">—</div>
+    <div class="port-sub" id="portWorstSub">—</div>
+  </div>
+</div>
+
+<main>
+  <div class="stock-list" id="stockList">
+    <div class="state-card">
+      <div class="icon">📊</div>
+      <div class="title">Connect your Google Sheet</div>
+      <div class="sub">Paste your published CSV URL in the bar below and tap Load.</div>
+    </div>
+  </div>
+</main>
+
+<div class="bottom-bar">
+  <div class="sheet-url-wrap">
+    <input class="sheet-url-input" id="sheetUrl" type="text" placeholder="Paste Google Sheet CSV URL…" />
+    <button class="btn-load" onclick="loadFromInput()">Load</button>
+  </div>
+  <button class="btn-refresh" id="refreshBtn" onclick="refresh()">
+    <span class="refresh-icon">↻</span> Refresh
+  </button>
+</div>
+
+<footer>
+  Data from your <a href="https://sheets.google.com" target="_blank">Google Sheet</a> via GoogleFinance. Not financial advice.
+</footer>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const STORAGE_KEY_URL = 'pulse_sheet_url';
+
+let sheetUrl    = localStorage.getItem(STORAGE_KEY_URL) || '';
+let stockData   = [];
+let selectedTicker = null;
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  setMarketStatus();
+  if (sheetUrl) {
+    document.getElementById('sheetUrl').value = sheetUrl;
+    loadData();
+  }
+}
+
+// ─── MARKET STATUS ────────────────────────────────────────────────────────────
+function setMarketStatus() {
+  const et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const day = et.getDay(), mins = et.getHours() * 60 + et.getMinutes();
+  const isOpen = day >= 1 && day <= 5 && mins >= 570 && mins < 960;
+  document.getElementById('mktDot').style.background = isOpen ? '#1a7a4a' : '#c0392b';
+  document.getElementById('mktStatus').textContent = isOpen ? 'Market Open' : 'Market Closed';
+}
+
+// ─── URL HANDLING ─────────────────────────────────────────────────────────────
+// Convert any Google Sheets URL format to a CSV export URL
+function toCsvUrl(raw) {
+  raw = raw.trim();
+  // Already a CSV pub URL
+  if (raw.includes('output=csv')) return raw;
+  // pubhtml URL → swap to CSV
+  if (raw.includes('/pubhtml')) return raw.replace('/pubhtml', '/pub').replace('output=html', '') + (raw.includes('?') ? '&output=csv' : '?output=csv');
+  // /pub URL without output param
+  if (raw.includes('/pub')) return raw + (raw.includes('?') ? '&output=csv' : '?output=csv');
+  // Regular /edit or /view URL — extract sheet ID and convert
+  const m = raw.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return `https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv`;
+  return raw;
+}
+
+function loadFromInput() {
+  const val = document.getElementById('sheetUrl').value.trim();
+  if (!val) return;
+  sheetUrl = toCsvUrl(val);
+  document.getElementById('sheetUrl').value = sheetUrl;
+  localStorage.setItem(STORAGE_KEY_URL, sheetUrl);
+  loadData();
+}
+
+async function refresh() {
+  if (!sheetUrl) return;
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  await loadData();
+  setTimeout(() => btn.classList.remove('spinning'), 500);
+}
+
+// ─── CSV FETCH & PARSE ────────────────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.trim().split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length < 2) return [];
+
+  // Parse a single CSV line respecting quoted fields
+  function parseLine(line) {
+    const fields = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { fields.push(cur.trim()); cur = ''; }
+      else { cur += c; }
+    }
+    fields.push(cur.trim());
+    return fields;
+  }
+
+  const headers = parseLine(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+  // Map headers to our expected fields
+  // Columns: Symbol, Symbol(dup), Stock Name, Current Price, Price Change, % Change, # Shares, Current Value
+  function col(candidates) {
+    for (const c of candidates) {
+      const i = headers.findIndex(h => h.includes(c));
+      if (i !== -1) return i;
+    }
+    return -1;
+  }
+
+  // Find indices for each field
+  // "symbol" appears twice — use first occurrence for ticker
+  const tickerIdx  = headers.indexOf('symbol') !== -1 ? headers.indexOf('symbol') : col(['ticker','symbol']);
+  const nameIdx    = col(['stockname','name','company']);
+  const priceIdx   = col(['currentprice','price','close','last']);
+  const changeIdx  = col(['pricechange','change','chg']);
+  const pctIdx     = col(['change','pct','percent','']);  // % Change column
+  const sharesIdx  = col(['shares','qty','quantity','numshares']);
+  const valueIdx   = col(['currentvalue','value','mktval','marketvalue']);
+
+  // For % change, find the column that contains "%" in original header
+  const origHeaders = parseLine(lines[0]);
+  const pctIdxFinal = origHeaders.findIndex(h => h.includes('%'));
+
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const f = parseLine(lines[i]);
+    if (f.length < 2) continue;
+
+    const ticker = f[tickerIdx]?.replace(/"/g, '').trim();
+    if (!ticker || ticker === '' || ticker.toLowerCase() === 'symbol') continue;
+
+    const clean = (idx) => {
+      if (idx === -1 || idx >= f.length) return NaN;
+      return parseFloat(f[idx].replace(/[$,%"]/g, '').trim());
+    };
+
+    const price   = clean(priceIdx);
+    const change  = clean(changeIdx);
+    const pct     = clean(pctIdxFinal !== -1 ? pctIdxFinal : pctIdx);
+    const shares  = clean(sharesIdx);
+    const value   = clean(valueIdx);
+    const name    = nameIdx !== -1 && f[nameIdx] ? f[nameIdx].replace(/"/g, '').trim() : ticker;
+
+    // Skip rows where price isn't a valid number (e.g. header remnants, totals rows)
+    if (isNaN(price) && isNaN(value)) continue;
+
+    rows.push({ ticker, name, price, change, pct, shares, value });
+  }
+  return rows;
+}
+
+async function loadData() {
+  if (!sheetUrl) return;
+  renderSkeletons();
+
+  try {
+    const res = await fetch(sheetUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    stockData = parseCSV(text);
+
+    if (stockData.length === 0) throw new Error('empty');
+
+    document.getElementById('lastUpdated').textContent =
+      new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    renderList();
+    updatePortfolio();
+  } catch (e) {
+    let msg = 'Could not load the sheet. Make sure it\'s published to the web as CSV.';
+    if (e.message === 'empty') msg = 'The sheet loaded but had no readable rows. Check the column format.';
+    if (e.message.includes('Failed to fetch')) msg = 'Network error — check your internet connection.';
+    document.getElementById('stockList').innerHTML = `
+      <div class="state-card">
+        <div class="icon">⚠️</div>
+        <div class="title">Couldn't load data</div>
+        <div class="sub">${msg}</div>
+      </div>`;
+    document.getElementById('portfolioBanner').classList.add('hidden');
+  }
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderSkeletons() {
+  const n = stockData.length || 4;
+  document.getElementById('stockList').innerHTML = Array(n).fill(0).map(() => `
+    <div class="skeleton-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div class="skel" style="width:48px;height:14px;margin-bottom:5px"></div><div class="skel" style="width:100px;height:11px"></div></div>
+        <div style="display:flex;gap:8px;align-items:center"><div class="skel" style="width:60px;height:15px"></div><div class="skel" style="width:52px;height:22px;border-radius:20px"></div></div>
+      </div>
+    </div>`).join('');
+}
+
+function fmt(n, dec = 2) {
+  if (n == null || isNaN(n)) return '—';
+  return n.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+
+function fmtMoney(n) {
+  if (n == null || isNaN(n)) return '—';
+  return '$' + fmt(Math.abs(n));
+}
+
+function renderList() {
+  const list = document.getElementById('stockList');
+  if (!stockData.length) {
+    list.innerHTML = `<div class="state-card"><div class="icon">📭</div><div class="title">No holdings found</div><div class="sub">Check that your sheet has the expected columns.</div></div>`;
+    return;
+  }
+
+  list.innerHTML = stockData.map((d, i) => {
+    const dir     = d.pct > 0 ? 'up' : d.pct < 0 ? 'down' : 'neutral';
+    const sign    = d.pct >= 0 ? '+' : '';
+    const selected = selectedTicker === d.ticker ? 'selected' : '';
+    const delay   = `${i * 0.03}s`;
+
+    // Inline P&L from sheet's own change * shares (or use value-derived change)
+    const dayPnl    = !isNaN(d.change) && !isNaN(d.shares) ? d.change * d.shares : NaN;
+    const pnlSign   = dayPnl >= 0 ? '+' : '−';
+    const pnlDir    = dayPnl >= 0 ? 'up' : 'down';
+    const inlinePnl = !isNaN(dayPnl)
+      ? `<span class="inline-pnl ${pnlDir}">(${pnlSign}${fmtMoney(dayPnl)})</span>`
+      : '';
+
+    // Expanded stats
+    const expItems = [
+      { label: 'Price',    value: !isNaN(d.price)  ? '$' + fmt(d.price)  : '—', cls: '' },
+      { label: 'Change',   value: !isNaN(d.change) ? (d.change>=0?'+':'') + '$' + fmt(Math.abs(d.change)) : '—', cls: dir },
+      { label: '% Change', value: !isNaN(d.pct)    ? sign + fmt(d.pct) + '%' : '—', cls: dir },
+      { label: 'Shares',   value: !isNaN(d.shares) ? fmt(d.shares, d.shares % 1 === 0 ? 0 : 4) : '—', cls: '' },
+      { label: 'Value',    value: !isNaN(d.value)  ? '$' + fmt(d.value)  : '—', cls: '' },
+      { label: "Today's P&L", value: !isNaN(dayPnl) ? (dayPnl>=0?'+':'') + '$' + fmt(Math.abs(dayPnl)) : '—', cls: pnlDir },
+    ].map(s => `
+      <div class="exp-item">
+        <div class="exp-label">${s.label}</div>
+        <div class="exp-value ${s.cls}">${s.value}</div>
+      </div>`).join('');
+
+    return `
+      <div class="stock-card ${selected}" style="animation-delay:${delay}" onclick="toggleCard('${d.ticker}')">
+        <div class="card-row">
+          <div class="card-left">
+            <div class="ticker-symbol">${d.ticker}</div>
+            <div class="company-name">${d.name}</div>
+          </div>
+          <div class="card-right">
+            <div class="price-main">${!isNaN(d.price) ? '$'+fmt(d.price) : '—'} ${inlinePnl}</div>
+            <div class="change-badge ${dir}">${sign}${fmt(d.pct)}%</div>
+          </div>
+        </div>
+        <div class="card-expanded">
+          <div class="exp-grid">${expItems}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ─── PORTFOLIO SUMMARY ────────────────────────────────────────────────────────
+function updatePortfolio() {
+  const banner = document.getElementById('portfolioBanner');
+  const valid  = stockData.filter(d => !isNaN(d.value));
+  if (!valid.length) { banner.classList.add('hidden'); return; }
+  banner.classList.remove('hidden');
+
+  const totalValue  = valid.reduce((s, d) => s + d.value, 0);
+  const totalPnl    = valid.filter(d => !isNaN(d.change) && !isNaN(d.shares))
+                           .reduce((s, d) => s + d.change * d.shares, 0);
+  const prevTotal   = totalValue - totalPnl;
+  const dayPct      = prevTotal > 0 ? (totalPnl / prevTotal) * 100 : 0;
+  const dayDir      = totalPnl >= 0 ? 'up' : 'down';
+  const daySign     = totalPnl >= 0 ? '+' : '';
+
+  let bestD = null, worstD = null;
+  valid.forEach(d => {
+    if (isNaN(d.pct)) return;
+    if (!bestD  || d.pct > bestD.pct)  bestD  = d;
+    if (!worstD || d.pct < worstD.pct) worstD = d;
+  });
+
+  document.getElementById('portTotal').textContent    = '$' + fmt(totalValue);
+  document.getElementById('portPositions').textContent = `${valid.length} position${valid.length !== 1 ? 's' : ''}`;
+
+  document.getElementById('portDayPnl').textContent  = `${daySign}$${fmt(Math.abs(totalPnl))}`;
+  document.getElementById('portDayPnl').className    = `port-value ${dayDir}`;
+  document.getElementById('portDayPct').textContent  = `${daySign}${fmt(dayPct)}% today`;
+  document.getElementById('portDayPct').className    = `port-sub ${dayDir}`;
+
+  if (bestD) {
+    const bs = bestD.pct >= 0 ? '+' : '';
+    document.getElementById('portBest').textContent    = bestD.ticker;
+    document.getElementById('portBest').className      = 'port-value up';
+    document.getElementById('portBestSub').textContent = `${bs}${fmt(bestD.pct)}%`;
+    document.getElementById('portBestSub').className   = 'port-sub up';
+  }
+  if (worstD) {
+    const ws = worstD.pct >= 0 ? '+' : '';
+    document.getElementById('portWorst').textContent    = worstD.ticker;
+    document.getElementById('portWorst').className      = 'port-value down';
+    document.getElementById('portWorstSub').textContent = `${ws}${fmt(worstD.pct)}%`;
+    document.getElementById('portWorstSub').className   = 'port-sub down';
+  }
+}
+
+// ─── CARD TOGGLE ─────────────────────────────────────────────────────────────
+function toggleCard(ticker) {
+  selectedTicker = selectedTicker === ticker ? null : ticker;
+  renderList();
+}
+
+// ─── START ────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
