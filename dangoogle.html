@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search</title>
+  <meta name="description" content="A custom search engine.">
+  <style>
+    :root {
+      --bg: #f7f7f5;
+      --card: #ffffff;
+      --text: #1d1d1b;
+      --muted: #6b6b66;
+      --border: #e2e2dd;
+      --accent: #2f5bea;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #121214;
+        --card: #1b1b1f;
+        --text: #ececea;
+        --muted: #9a9a94;
+        --border: #2d2d33;
+        --accent: #7b9bff;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5;
+    }
+    header {
+      text-align: center;
+      padding: 72px 16px 28px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: -0.02em;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+    }
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 16px 48px;
+    }
+    .search-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+    footer {
+      text-align: center;
+      padding: 20px 16px 28px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* Light touch-ups for the Google widget so it blends with the page */
+    .gsc-control-cse,
+    .gsc-control-cse .gsc-table-result {
+      background: transparent !important;
+      border: 0 !important;
+      padding: 0 !important;
+      font-family: inherit !important;
+    }
+    .gsc-input-box {
+      border-radius: 10px !important;
+      background: #fff !important;
+    }
+    .gsc-search-button-v2 {
+      background: var(--accent) !important;
+      border-color: var(--accent) !important;
+      border-radius: 10px !important;
+    }
+    @media (prefers-color-scheme: dark) {
+      .gs-title, .gs-title b, a.gs-title { color: var(--accent) !important; }
+      .gs-snippet, .gsc-url-top, .gs-bidi-start-align { color: var(--muted) !important; }
+      .gsc-results .gsc-cursor-page { color: var(--text) !important; }
+      .gsc-results-wrapper-overlay { background: var(--card) !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Search</h1>
+    <p>Type below to search.</p>
+  </header>
+
+  <main>
+    <div class="search-card">
+      <!-- Google Programmable Search Engine -->
+      <script async src="https://cse.google.com/cse.js?cx=51bc02e5190334414"></script>
+      <div class="gcse-search"></div>
+    </div>
+  </main>
+
+  <footer>Powered by Google Programmable Search</footer>
+</body>
+</html>
