@@ -293,7 +293,9 @@
       padding: 0;
       list-style: none;
     }
-    .chips a {
+    .chips button {
+      font-family: inherit;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -309,13 +311,51 @@
       border-radius: 999px;
       transition: transform 0.15s, border-color 0.2s, background 0.2s;
     }
-    .chips a:hover {
+    .chips button:hover {
       transform: translateY(-1px);
       border-color: var(--accent);
       background: var(--accent-soft);
     }
-    .chips a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .chips button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .chips button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .filter-note {
+      min-height: 1.4em;
+      margin: 14px 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
     .chips img { width: 16px; height: 16px; border-radius: 4px; }
+
+    /* ---- Centering fixes: remove Google's built-in offsets ---- */
+    .gcse-search,
+    .gsc-control-cse,
+    .gsc-control-cse * { box-sizing: border-box; }
+    .gcse-search { width: 100%; }
+    .gsc-control-cse { width: 100% !important; margin: 0 !important; }
+
+    table.gsc-search-box {
+      width: 100% !important;
+      margin: 0 !important;
+      border-collapse: collapse !important;
+      border-spacing: 0 !important;
+    }
+    table.gsc-search-box td { padding: 0 !important; }
+    table.gsc-search-box td.gsc-input { width: 100% !important; padding: 0 10px 0 0 !important; }
+    table.gsc-search-box td.gsc-search-button { width: 1% !important; }
+    table.gsc-search-box .gsc-search-button { margin: 0 !important; }
+    .gsc-input-box { width: 100% !important; margin: 0 !important; }
+
+    .gsc-wrapper,
+    .gsc-results-wrapper-nooverlay,
+    .gsc-results,
+    .gsc-above-wrapper-area-container { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    .gsc-above-wrapper-area { padding-left: 0 !important; padding-right: 0 !important; }
+    .gsc-webResult.gsc-result { padding: 18px 12px !important; }
+    .gsc-webResult .gsc-table-result { width: 100% !important; }
 
     @media (max-width: 520px) {
       header { padding-top: 44px; }
@@ -335,14 +375,27 @@
   <main>
     <div class="search-card rise d3">
       <!-- Google Programmable Search Engine -->
-      <script async src="https://cse.google.com/cse.js?cx=51bc02e5190334414">
+      <script>
+        // Appends the selected site filter to every search (set by the chips below).
+        window.activeSite = null;
+        window.__gcse = {
+          searchCallbacks: {
+            web: {
+              starting: function (gname, query) {
+                return window.activeSite ? query + " site:" + window.activeSite : query;
+              }
+            }
+          }
+        };
       </script>
-<div class="gcse-search"></div>
+      <script async src="https://cse.google.com/cse.js?cx=51bc02e5190334414"></script>
+      <div class="gcse-search" data-gname="main"></div>
     </div>
 
     <section class="sites rise d3" aria-labelledby="sites-label">
       <p class="sites-label" id="sites-label">Searching across</p>
       <ul class="chips" id="chips"></ul>
+      <p class="filter-note" id="filter-note" aria-live="polite"></p>
     </section>
   </main>
 
@@ -367,25 +420,70 @@
     ];
 
     const list = document.getElementById("chips");
-    SITES.forEach(({ name, url }) => {
-      const host = new URL(url).hostname;
+    const note = document.getElementById("filter-note");
+    const buttons = [];
+
+    function getBox() {
+      return document.querySelector("input.gsc-input");
+    }
+
+    function runSearch() {
+      const box = getBox();
+      const query = box ? box.value.trim() : "";
+      if (!query) {
+        if (box) box.focus();
+        return;
+      }
+      try {
+        google.search.cse.element.getElement("main").execute(query);
+      } catch (e) {
+        // Search widget not ready yet; the filter will apply to the next search.
+      }
+    }
+
+    function setFilter(site, label, btn) {
+      window.activeSite = site;
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      const hasQuery = getBox() && getBox().value.trim();
+      if (!site) {
+        note.textContent = "";
+      } else if (hasQuery) {
+        note.textContent = "Showing results from " + label + " only.";
+      } else {
+        note.textContent = "Searching " + label + " only. Type a query above.";
+      }
+      runSearch();
+    }
+
+    function addChip(label, site, iconHost) {
       const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.setAttribute("aria-pressed", String(site === null));
 
-      const img = document.createElement("img");
-      img.src = "https://www.google.com/s2/favicons?domain=" + host + "&sz=32";
-      img.alt = "";
-      img.width = 16;
-      img.height = 16;
-      img.loading = "lazy";
-      img.onerror = () => img.remove();
+      if (iconHost) {
+        const img = document.createElement("img");
+        img.src = "https://www.google.com/s2/favicons?domain=" + iconHost + "&sz=32";
+        img.alt = "";
+        img.width = 16;
+        img.height = 16;
+        img.loading = "lazy";
+        img.onerror = () => img.remove();
+        btn.append(img);
+      }
+      btn.append(document.createTextNode(label));
+      btn.addEventListener("click", () => setFilter(site, label, btn));
 
-      a.append(img, document.createTextNode(name));
-      li.append(a);
+      buttons.push(btn);
+      li.append(btn);
       list.append(li);
+    }
+
+    addChip("All sites", null, null);
+    SITES.forEach(({ name, url }) => {
+      const u = new URL(url);
+      const site = u.hostname.replace(/^www\./, "") + (u.pathname !== "/" ? u.pathname.replace(/\/$/, "") : "");
+      addChip(name, site, u.hostname);
     });
   </script>
 </body>
