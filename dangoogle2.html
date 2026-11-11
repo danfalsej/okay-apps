@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search</title>
+  <meta name="description" content="A custom search engine.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f2ec;
+      --surface: rgba(255, 255, 255, 0.72);
+      --surface-solid: #ffffff;
+      --text: #1f1b16;
+      --muted: #7a7266;
+      --border: rgba(31, 27, 22, 0.10);
+      --accent: #d9542b;
+      --accent-soft: rgba(217, 84, 43, 0.12);
+      --link: #1d4ed8;
+      --shadow: 0 1px 2px rgba(31, 27, 22, 0.04), 0 24px 60px -20px rgba(80, 50, 20, 0.25);
+      --blob1: #ffc9a8;
+      --blob2: #ffe3a3;
+      --blob3: #c9d8ff;
+      --blob-opacity: 0.75;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f0e12;
+        --surface: rgba(28, 26, 34, 0.72);
+        --surface-solid: #1c1a22;
+        --text: #f1ede6;
+        --muted: #9b94a6;
+        --border: rgba(255, 255, 255, 0.09);
+        --accent: #ff7a4d;
+        --accent-soft: rgba(255, 122, 77, 0.16);
+        --link: #8fb0ff;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+        --blob1: #5b2a1c;
+        --blob2: #4a3a14;
+        --blob3: #1f2b5c;
+        --blob-opacity: 0.8;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Soft drifting background glow */
+    .glow {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .glow span {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: var(--blob-opacity);
+      animation: drift 22s ease-in-out infinite alternate;
+    }
+    .glow span:nth-child(1) { width: 52vmax; height: 52vmax; background: var(--blob1); top: -18vmax; left: -12vmax; }
+    .glow span:nth-child(2) { width: 44vmax; height: 44vmax; background: var(--blob2); top: 10vmax; right: -16vmax; animation-delay: -7s; }
+    .glow span:nth-child(3) { width: 48vmax; height: 48vmax; background: var(--blob3); bottom: -24vmax; left: 18vmax; animation-delay: -13s; }
+    @keyframes drift {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to   { transform: translate3d(4vmax, 3vmax, 0) scale(1.08); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .glow span { animation: none; }
+      .rise { animation: none !important; opacity: 1 !important; transform: none !important; }
+    }
+
+    header, main, footer { position: relative; z-index: 1; }
+
+    header {
+      text-align: center;
+      padding: clamp(56px, 11vh, 120px) 20px 32px;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 22px;
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-family: "Fraunces", Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(2.6rem, 8vw, 4.8rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+    h1 em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+    header p {
+      margin: 0 auto;
+      max-width: 34ch;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 16px 56px;
+    }
+    .search-card {
+      background: var(--surface);
+      -webkit-backdrop-filter: blur(18px) saturate(1.3);
+      backdrop-filter: blur(18px) saturate(1.3);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: clamp(14px, 3vw, 26px);
+      box-shadow: var(--shadow);
+    }
+
+    footer {
+      text-align: center;
+      padding: 8px 16px 32px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    /* Entrance animation */
+    .rise {
+      opacity: 0;
+      transform: translateY(14px);
+      animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    }
+    .rise.d1 { animation-delay: 0.05s; }
+    .rise.d2 { animation-delay: 0.15s; }
+    .rise.d3 { animation-delay: 0.28s; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+
+    /* ---- Google search widget, restyled ---- */
+    .gsc-control-cse,
+    .gsc-control-cse .gsc-table-result,
+    .gsc-results-wrapper-nooverlay {
+      background: transparent !important;
+      border: 0 !important;
+      padding: 0 !important;
+      font-family: "Inter", system-ui, sans-serif !important;
+    }
+    .gsc-control-cse { color: var(--text) !important; }
+
+    /* Search bar */
+    table.gsc-search-box { margin: 0 !important; }
+    table.gsc-search-box td { vertical-align: middle !important; }
+    td.gsc-input { padding-right: 10px !important; }
+    .gsc-input-box {
+      background: var(--surface-solid) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 999px !important;
+      padding: 4px 8px 4px 14px !important;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .gsc-input-box:focus-within {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+    table.gsc-input { background: transparent !important; }
+    input.gsc-input {
+      background: transparent !important;
+      color: var(--text) !important;
+      font-family: "Inter", system-ui, sans-serif !important;
+      font-size: 1.05rem !important;
+      padding: 10px 6px !important;
+      text-indent: 0 !important;
+    }
+    input.gsc-input::placeholder { color: var(--muted) !important; }
+    .gsib_b { background: transparent !important; }
+    .gsst_a .gscb_a { color: var(--muted) !important; }
+
+    button.gsc-search-button,
+    .gsc-search-button-v2 {
+      background: var(--accent) !important;
+      border: 0 !important;
+      border-radius: 999px !important;
+      padding: 13px 20px !important;
+      margin: 0 !important;
+      cursor: pointer;
+      transition: transform 0.15s, filter 0.2s;
+    }
+    .gsc-search-button-v2:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .gsc-search-button-v2:active { transform: translateY(0); }
+    .gsc-search-button-v2 svg { fill: #fff !important; width: 18px; height: 18px; }
+
+    /* Results */
+    .gsc-results-wrapper-overlay,
+    .gsc-modal-background-image { background: var(--surface-solid) !important; }
+    .gsc-above-wrapper-area { border-bottom: 1px solid var(--border) !important; padding: 12px 0 !important; }
+    .gsc-result-info { color: var(--muted) !important; font-size: 0.85rem !important; padding-left: 0 !important; }
+    .gsc-orderby-label, .gsc-selected-option { color: var(--muted) !important; }
+    .gsc-selected-option-container, .gsc-option-menu-container { background: var(--surface-solid) !important; }
+    .gsc-option-menu-item { color: var(--text) !important; }
+    .gsc-option-menu-item-highlighted { background: var(--accent-soft) !important; }
+
+    .gsc-webResult.gsc-result,
+    .gsc-results .gsc-imageResult {
+      background: transparent !important;
+      border: 0 !important;
+      border-bottom: 1px solid var(--border) !important;
+      border-radius: 0 !important;
+      padding: 18px 4px !important;
+      margin: 0 !important;
+    }
+    .gsc-webResult.gsc-result:hover { background: var(--accent-soft) !important; border-radius: 14px !important; }
+    .gsc-webResult.gsc-result:last-child { border-bottom: 0 !important; }
+
+    .gs-title, a.gs-title, .gs-title b, a.gs-title b {
+      color: var(--link) !important;
+      font-family: "Fraunces", Georgia, serif !important;
+      font-size: 1.2rem !important;
+      font-weight: 500 !important;
+      text-decoration: none !important;
+    }
+    a.gs-title:hover { text-decoration: underline !important; }
+    .gs-snippet, .gs-bidi-start-align.gs-snippet { color: var(--muted) !important; font-size: 0.95rem !important; line-height: 1.55 !important; }
+    .gs-snippet b { color: var(--text) !important; font-weight: 600 !important; }
+    .gsc-url-top, .gs-visibleUrl, .gs-visibleUrl-short { color: var(--muted) !important; font-size: 0.8rem !important; }
+    .gs-image-box img, img.gs-image { border-radius: 10px !important; }
+    .gs-no-results-result .gs-snippet {
+      background: transparent !important; border: 0 !important; color: var(--muted) !important;
+    }
+    .gsc-adBlock, .gsc-thumbnail-inside, .gsc-url-top { padding-left: 0 !important; }
+
+    /* Pagination */
+    .gsc-cursor-box { margin: 20px 0 4px !important; text-align: center !important; }
+    .gsc-cursor-page {
+      color: var(--text) !important;
+      background: transparent !important;
+      border-radius: 999px !important;
+      padding: 6px 12px !important;
+      transition: background 0.15s;
+    }
+    .gsc-cursor-page:hover { background: var(--accent-soft) !important; text-decoration: none !important; }
+    .gsc-cursor-current-page { background: var(--accent) !important; color: #fff !important; font-weight: 600 !important; }
+
+    /* Tabs (if your engine has refinements) */
+    .gsc-tabsArea { border-bottom: 1px solid var(--border) !important; }
+    .gsc-tabHeader { color: var(--muted) !important; background: transparent !important; border: 0 !important; }
+    .gsc-tabHeader.gsc-tabhActive { color: var(--accent) !important; border-bottom: 2px solid var(--accent) !important; }
+
+    /* Autocomplete dropdown */
+    table.gstl_50.gssb_c { border-radius: 16px !important; overflow: hidden; box-shadow: var(--shadow) !important; }
+    .gssb_c .gsc-completion-container, .gssb_m, .gssb_e { background: var(--surface-solid) !important; }
+    .gsc-completion-selected, .gssb_i { background: var(--accent-soft) !important; }
+    .gsc-completion-container td, .gsq_a { color: var(--text) !important; }
+
+    /* ---- Sites list ---- */
+    .sites { margin-top: 28px; text-align: center; }
+    .sites-label {
+      margin: 0 0 14px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .chips button {
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px 7px 10px;
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-decoration: none;
+      background: var(--surface);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      transition: transform 0.15s, border-color 0.2s, background 0.2s;
+    }
+    .chips button:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .chips button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .chips button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .filter-note {
+      min-height: 1.4em;
+      margin: 14px 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .chips img { width: 16px; height: 16px; border-radius: 4px; }
+
+    @media (max-width: 520px) {
+      header { padding-top: 44px; }
+      .gsc-search-button-v2 { padding: 12px 16px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <header>
+    <div class="eyebrow rise d1">Custom search</div>
+    <h1 class="rise d2">Find <em>exactly</em> what<br>you're looking for</h1>
+    <p class="rise d3">Search across a hand-picked set of sites.</p>
+  </header>
+
+  <main>
+    <div class="search-card rise d3">
+      <!-- Google Programmable Search Engine -->
+      <script>
+        // Appends the selected site filter to every search (set by the chips below).
+        window.activeSite = null;
+        window.__gcse = {
+          searchCallbacks: {
+            web: {
+              starting: function (gname, query) {
+                return window.activeSite ? query + " site:" + window.activeSite : query;
+              }
+            }
+          }
+        };
+      </script>
+      <script async src="https://cse.google.com/cse.js?cx=51bc02e5190334414"></script>
+      <div class="gcse-search" data-gname="main"></div>
+    </div>
+
+    <section class="sites rise d3" aria-labelledby="sites-label">
+      <p class="sites-label" id="sites-label">Searching across</p>
+      <ul class="chips" id="chips"></ul>
+      <p class="filter-note" id="filter-note" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <footer>Powered by Google Programmable Search</footer>
+
+  <script>
+    // Edit this list to add or remove sites. "url" is where the chip links to.
+    const SITES = [
+      { name: "Ars Technica",  url: "https://arstechnica.com/" },
+      { name: "Wired",         url: "https://www.wired.com/" },
+      { name: "Longreads",     url: "https://longreads.com/" },
+      { name: "Slate",         url: "https://slate.com/" },
+      { name: "CNN",           url: "https://www.cnn.com/" },
+      { name: "BBC",           url: "https://www.bbc.com/" },
+      { name: "Reuters",       url: "https://www.reuters.com/" },
+      { name: "AP News",       url: "https://apnews.com/" },
+      { name: "The Atlantic",  url: "https://www.theatlantic.com/" },
+      { name: "The Guardian",  url: "https://www.theguardian.com/us" },
+      { name: "The New Yorker",url: "https://www.newyorker.com/" },
+      { name: "The New York Times", url: "https://www.nytimes.com/" },
+      { name: "NPR",           url: "https://www.npr.org/" }
+    ];
+
+    const list = document.getElementById("chips");
+    const note = document.getElementById("filter-note");
+    const buttons = [];
+
+    function getBox() {
+      return document.querySelector("input.gsc-input");
+    }
+
+    function runSearch() {
+      const box = getBox();
+      const query = box ? box.value.trim() : "";
+      if (!query) {
+        if (box) box.focus();
+        return;
+      }
+      try {
+        google.search.cse.element.getElement("main").execute(query);
+      } catch (e) {
+        // Search widget not ready yet; the filter will apply to the next search.
+      }
+    }
+
+    function setFilter(site, label, btn) {
+      window.activeSite = site;
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      const hasQuery = getBox() && getBox().value.trim();
+      if (!site) {
+        note.textContent = "";
+      } else if (hasQuery) {
+        note.textContent = "Showing results from " + label + " only.";
+      } else {
+        note.textContent = "Searching " + label + " only. Type a query above.";
+      }
+      runSearch();
+    }
+
+    function addChip(label, site, iconHost) {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.setAttribute("aria-pressed", String(site === null));
+
+      if (iconHost) {
+        const img = document.createElement("img");
+        img.src = "https://www.google.com/s2/favicons?domain=" + iconHost + "&sz=32";
+        img.alt = "";
+        img.width = 16;
+        img.height = 16;
+        img.loading = "lazy";
+        img.onerror = () => img.remove();
+        btn.append(img);
+      }
+      btn.append(document.createTextNode(label));
+      btn.addEventListener("click", () => setFilter(site, label, btn));
+
+      buttons.push(btn);
+      li.append(btn);
+      list.append(li);
+    }
+
+    addChip("All sites", null, null);
+    SITES.forEach(({ name, url }) => {
+      const u = new URL(url);
+      const site = u.hostname.replace(/^www\./, "") + (u.pathname !== "/" ? u.pathname.replace(/\/$/, "") : "");
+      addChip(name, site, u.hostname);
+    });
+  </script>
+</body>
+</html>
