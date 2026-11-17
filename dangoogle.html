@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Search</title>
+  <title>DANgle</title>
   <meta name="description" content="A custom search engine.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -111,6 +111,17 @@
       font-size: clamp(2.6rem, 8vw, 4.8rem);
       line-height: 1.02;
       letter-spacing: -0.03em;
+    }
+    /* DANgle = Dan + Google: the two halves are styled differently */
+    h1 .dan {
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    h1 .gle {
+      font-style: italic;
+      font-weight: 400;
+      margin-left: 0.02em;
     }
     h1 em {
       font-style: italic;
@@ -322,6 +333,7 @@
       border-color: var(--accent);
       color: #fff;
     }
+    .sites-label.date-label { margin-top: 22px; }
     .filter-note {
       min-height: 1.4em;
       margin: 14px 0 0;
@@ -329,33 +341,6 @@
       color: var(--muted);
     }
     .chips img { width: 16px; height: 16px; border-radius: 4px; }
-
-    /* ---- Centering fixes: remove Google's built-in offsets ---- */
-    .gcse-search,
-    .gsc-control-cse,
-    .gsc-control-cse * { box-sizing: border-box; }
-    .gcse-search { width: 100%; }
-    .gsc-control-cse { width: 100% !important; margin: 0 !important; }
-
-    table.gsc-search-box {
-      width: 100% !important;
-      margin: 0 !important;
-      border-collapse: collapse !important;
-      border-spacing: 0 !important;
-    }
-    table.gsc-search-box td { padding: 0 !important; }
-    table.gsc-search-box td.gsc-input { width: 100% !important; padding: 0 10px 0 0 !important; }
-    table.gsc-search-box td.gsc-search-button { width: 1% !important; }
-    table.gsc-search-box .gsc-search-button { margin: 0 !important; }
-    .gsc-input-box { width: 100% !important; margin: 0 !important; }
-
-    .gsc-wrapper,
-    .gsc-results-wrapper-nooverlay,
-    .gsc-results,
-    .gsc-above-wrapper-area-container { width: 100% !important; margin: 0 !important; padding: 0 !important; }
-    .gsc-above-wrapper-area { padding-left: 0 !important; padding-right: 0 !important; }
-    .gsc-webResult.gsc-result { padding: 18px 12px !important; }
-    .gsc-webResult .gsc-table-result { width: 100% !important; }
 
     @media (max-width: 520px) {
       header { padding-top: 44px; }
@@ -368,7 +353,7 @@
 
   <header>
     <div class="eyebrow rise d1">Custom search</div>
-    <h1 class="rise d2">Find <em>exactly</em> what<br>you're looking for</h1>
+    <h1 class="rise d2" aria-label="DANgle"><span class="dan">DAN</span><span class="gle">gle</span></h1>
     <p class="rise d3">Search across a hand-picked set of sites.</p>
   </header>
 
@@ -382,7 +367,10 @@
           searchCallbacks: {
             web: {
               starting: function (gname, query) {
-                return window.activeSite ? query + " site:" + window.activeSite : query;
+                var q = query;
+                if (window.activeSite) q += " site:" + window.activeSite;
+                if (window.activeAfter) q += " after:" + window.activeAfter;
+                return q;
               }
             }
           }
@@ -395,6 +383,8 @@
     <section class="sites rise d3" aria-labelledby="sites-label">
       <p class="sites-label" id="sites-label">Searching across</p>
       <ul class="chips" id="chips"></ul>
+      <p class="sites-label date-label" id="date-label">Date</p>
+      <ul class="chips" id="date-chips" aria-labelledby="date-label"></ul>
       <p class="filter-note" id="filter-note" aria-live="polite"></p>
     </section>
   </main>
@@ -441,17 +431,29 @@
       }
     }
 
-    function setFilter(site, label, btn) {
-      window.activeSite = site;
-      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-      const hasQuery = getBox() && getBox().value.trim();
-      if (!site) {
+    let siteLabel = null;
+    let dateLabel = null;
+
+    function updateNote() {
+      const box = getBox();
+      const hasQuery = box && box.value.trim();
+      const parts = [];
+      if (siteLabel) parts.push(siteLabel);
+      if (dateLabel) parts.push(dateLabel.toLowerCase());
+      if (!parts.length) {
         note.textContent = "";
       } else if (hasQuery) {
-        note.textContent = "Showing results from " + label + " only.";
+        note.textContent = "Filtering: " + parts.join(", ") + ".";
       } else {
-        note.textContent = "Searching " + label + " only. Type a query above.";
+        note.textContent = "Filters set: " + parts.join(", ") + ". Type a query above.";
       }
+    }
+
+    function setFilter(site, label, btn) {
+      window.activeSite = site;
+      siteLabel = site ? label : null;
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      updateNote();
       runSearch();
     }
 
@@ -484,6 +486,41 @@
       const u = new URL(url);
       const site = u.hostname.replace(/^www\./, "") + (u.pathname !== "/" ? u.pathname.replace(/\/$/, "") : "");
       addChip(name, site, u.hostname);
+    });
+
+    // ---- Date presets ----
+    function dateAgo(unit, n) {
+      const d = new Date();
+      if (unit === "y") d.setFullYear(d.getFullYear() - n);
+      else d.setMonth(d.getMonth() - n);
+      return d.toISOString().slice(0, 10); // YYYY-MM-DD
+    }
+
+    const DATE_PRESETS = [
+      { label: "Any time",      after: () => null },
+      { label: "Past month",    after: () => dateAgo("m", 1) },
+      { label: "Past year",     after: () => dateAgo("y", 1) },
+      { label: "Past 10 years", after: () => dateAgo("y", 10) }
+    ];
+
+    const dateList = document.getElementById("date-chips");
+    const dateButtons = [];
+    DATE_PRESETS.forEach((preset, i) => {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = preset.label;
+      btn.setAttribute("aria-pressed", String(i === 0));
+      btn.addEventListener("click", () => {
+        window.activeAfter = preset.after();
+        dateLabel = window.activeAfter ? preset.label : null;
+        dateButtons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+        updateNote();
+        runSearch();
+      });
+      dateButtons.push(btn);
+      li.append(btn);
+      dateList.append(li);
     });
   </script>
 </body>
